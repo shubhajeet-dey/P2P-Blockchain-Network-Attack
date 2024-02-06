@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-from collections import deque
 from node import Node
-import numpy as np
+from utils import create_graph, connected_graph
 import random
 
 # Initialize Nodes and assign Slow, Fast, Low CPU and High CPU features.
@@ -42,7 +41,11 @@ def init_nodes(N, z0, z1, PoWI):
 
 		nodeArray.append(Node(i, isSlow, isLowCPU, hashPower, PoWI))
 
-	# Creating peer graph network and checking if it is a connected graph or not
+	
+	# Creating a connected peer graph network
+	gen_graph(nodeArray)
+
+	return nodeArray
 
 # Generate graph and check if connected or not
 def gen_graph(nodeArray):
@@ -56,30 +59,5 @@ def gen_graph(nodeArray):
 		if(connected_graph(nodeArray)):
 			break
 
-# Create graph with each node having randomly connections to 3-6 other peers
-def create_graph(nodeArray):
-	pass
 
-def connected_graph(nodeArray):
-	visited = [False] * len(nodeArray)
-
-	# Performing BFS (Breadth First Search)
-	queue = deque()
-	queue.append(0)
-	visited[0] = True
-
-	while(not queue.empty()):
-		ele = queue.popleft()
-
-		for peer in nodeArray[ele].peers.keys()
-			if visited[peer] == False:
-				queue.append(peer)
-				visited[peer] = True
-
-	# Some nodes are not visited, so graph not connected
-	if False in visited:
-		return False
-	
-	# Graph is connected
-	return True
 

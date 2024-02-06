@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+from collections import deque
+from numpy.random import uniform
+import random
+
+# Assign Edge between node i and node j
+def assign_edge(nodeArray, i, j):
+
+	# Setting propagation delay from a uniform distribution between 10ms and 500ms
+	propagation_delay = uniform(10, 500)
+
+	# Setting link speed for this edge in bits/millisecond = 1000 bits/second
+	# If both are fast, link speed = 100 Mbps = 10^8 bps = 10^5 bits/millisecond
+	if nodeArray[i].isSlow or nodeArray[j].isSlow:
+		link_speed = 5000
+	else:
+	# If one of them is slow, link speed = 5 Mbps = 5*10^6 bps = 5000 bits/millisecond
+		link_speed = 100000
+
+	# Adding each other as peers
+	nodeArray[i].peers[j] = [ nodeArray[j], propagation_delay, link_speed ]
+	nodeArray[j].peers[i] = [ nodeArray[i], propagation_delay, link_speed ]
+
+# Create graph with each node having randomly connections to 3-6 other peers
+def create_graph(nodeArray):
+	nodePeers = [[i, 0] for i in range(nodeArray)]
+	random.shuffle(nodePeers)
+	
+	while(True):
+		# Every node has more than 3 peers
+		if nodePeers[0][1] >= 3:
+			break
+
+		# Maximum number of peers that can be added to the 1st element in the list
+		max_remaining_peers = 6 - nodePeers[0][1]
+
+		# Now, randomly select the number of peers to be added
+		addPeers = random.randint(1, max_remaining_peers)
+
+		# Random Shuffle introduces randomness, even when looping sequentially
+		for i in range(1, min(addPeers+1, len(nodePeers))):
+
+			# If this node has less than 6 peers then add
+			if(nodePeers[i][1] < 6):
+				nodePeers[i][1] = nodePeers[i][1] + 1
+				nodePeers[0][1] = nodePeers[0][1] + 1
+				assign_edge(nodeArray, nodePeers[0][0], nodePeers[i][0])
+			else:
+			# If equal to 6, then next following nodes will also have 6 peers (as sorted) 
+				break 
+		
+		# Sort nodes based on number of peers, random shuffle to ensure randomness
+		random.shuffle(nodePeers)
+		nodePeers.sort(key=lambda node: node[1])
+
+# Checking if generated graph is connected
+def connected_graph(nodeArray):
+	visited = [False] * len(nodeArray)
+
+	# Performing BFS (Breadth First Search)
+	queue = deque()
+	queue.append(0)
+	visited[0] = True
+
+	while(not queue.empty()):
+		ele = queue.popleft()
+
+		for peer in nodeArray[ele].peers.keys()
+			if visited[peer] == False:
+				queue.append(peer)
+				visited[peer] = True
+
+	# Some nodes are not visited, so graph not connected
+	if False in visited:
+		return False
+	
+	# Graph is connected
+	return True
