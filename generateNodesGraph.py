@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 def generate_connectivity_graph(nodeArray):
     G = nx.Graph()
     for node in nodeArray: #iterating over the all noe object from the nodeArray list of nodes 
-        G.add_node(node.nodeID, label=f"Node {node.nodeID}, Hashpower: {node.hashPower}")  # we can adjust attributes which to display
+        # G.add_node(node.nodeID, label=f"Node {node.nodeID}, Hashpower: {node.hashPower}")  # we can adjust attributes which to display
+        G.add_node(node.nodeID, label=f"{node.nodeID}")
         for peer in node.peers.keys(): #iteratig over the peers list/dictionary of the current node and add edge between these
             G.add_edge(node.nodeID, peer)
     return G
@@ -21,6 +22,7 @@ def generate_node_connectivity_graph(nodeArray):
     plt.title("Node Connectivity Graph")
 
     # Saving the graph as an image file
+    # plt.savefig("Results/GraphOfNodes/node_connectivity_graph_of_N_Nodes.png")
     plt.savefig("node_connectivity_graph.png")
 
     # To Show the graph
