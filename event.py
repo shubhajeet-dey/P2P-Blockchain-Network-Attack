@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-class event:
+class Event:
 
     def __init__(self, eventType, timestamp, createdBy):
         self.eventType = eventType
