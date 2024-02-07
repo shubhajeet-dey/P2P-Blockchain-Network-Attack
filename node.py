@@ -8,6 +8,7 @@ class Node:
 	isLowCPU: Boolean value stating if the node has low or high CPU
 	hashPower: Node's fraction of the total hashing power.
 	PoWI: The interarrival time between blocks  on average
+	status: Status of miner, possible status: {"free", "mining"}
 	blocksSeen: Dictionary of blocks present in the Node's Blockchain Tree, Structure = { BlockID (BlockHash): { "arrival_time": ~ , "Block": Block Object } }
 	leafBlocks: Dictionary of blocks which are leaf nodes in the Node's Blockchain Tree, Structure = { BlockID (BlockHash): Block Object }
 	peers: Contains information about the peers of the nodes, Structure = { Peer's NodeID : [ Peer's Node Object, propagation delay (rho_ij), link speed (c_ij) ], ... }
@@ -21,6 +22,7 @@ class Node:
 		self.isLowCPU = isLowCPU
 		self.hashPower = hashPower
 		self.PoWI = PoWI
+		self.status = "free"
 		self.blocksSeen = dict()
 		self.leafBlocks = dict()
 		self.peers = dict()
