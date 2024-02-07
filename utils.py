@@ -23,7 +23,7 @@ def assign_edge(nodeArray, i, j):
 
 # Create graph with each node having randomly connections to 3-6 other peers
 def create_graph(nodeArray):
-	nodePeers = [[i, 0] for i in range(nodeArray)]
+	nodePeers = [[i, 0] for i in range(len(nodeArray))]
 	random.shuffle(nodePeers)
 	
 	while(True):
@@ -57,15 +57,15 @@ def create_graph(nodeArray):
 def connected_graph(nodeArray):
 	visited = [False] * len(nodeArray)
 
+	print("Checking if Graph is connected..")
 	# Performing BFS (Breadth First Search)
 	queue = deque()
 	queue.append(0)
 	visited[0] = True
 
-	while(not queue.empty()):
+	while(queue):
 		ele = queue.popleft()
-
-		for peer in nodeArray[ele].peers.keys()
+		for peer in nodeArray[ele].peers.keys():
 			if visited[peer] == False:
 				queue.append(peer)
 				visited[peer] = True
@@ -74,5 +74,6 @@ def connected_graph(nodeArray):
 	if False in visited:
 		return False
 	
+	print("Graph is connected!!")
 	# Graph is connected
 	return True

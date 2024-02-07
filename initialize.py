@@ -2,6 +2,7 @@
 from node import Node
 from utils import create_graph, connected_graph
 import random
+from generateNodesGraph import generate_node_connectivity_graph
 
 # Initialize Nodes and assign Slow, Fast, Low CPU and High CPU features.
 # PowI represents interarrival time between blocks on average
@@ -57,6 +58,8 @@ def gen_graph(nodeArray):
 		create_graph(nodeArray)
 
 		if(connected_graph(nodeArray)):
+			#Since the graph of Nodes is now connected let us generate visual representation of it and save it in node_connectivity_graph.png
+			generate_node_connectivity_graph(nodeArray)
 			break
 
 
