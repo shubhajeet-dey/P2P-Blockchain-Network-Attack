@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
 	# Loop maxEventLoop times
 	cnt = 0
-	while(cnt < maxEventLoop):
+	while(cnt < maxEventLoop and 0 < len(eventQueue)):
 		# Getting nearest event (lowest timestamp)
 		currEvent = heapq.heappop(eventQueue)
 
