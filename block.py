@@ -11,17 +11,18 @@ class Block:
     blockHash: Unique Identifier for each Block
 
     '''
-    def __init__(self, timestamp, previousBlock, isGenesis) :
+    def __init__(self, timestamp, previousBlock, isGenesis, transactions) :
         self.timestamp = timestamp
         self.previousBlock = previousBlock
-        self.prevBlockHash = previousBlock.blockHash
+        if not isGenesis:
+            self.prevBlockHash = previousBlock.blockHash
         self.isGenesis = isGenesis
-        self.transactions = []
+        self.transactions = transactions
         self.blockHash = self.calculateBlockHash()
     
     def calculateBlockHash(self):
         txnStrings = ''.join(transaction.TXNString for transaction in self.transactions)
-        blockData = str(self.timestamp) + txnStrings + str(self.prevBlockHash)
+        blockData = str(self.timestamp) + txnStrings + ('' if self.isGenesis else self.prevBlockHash)
         blockHash = hashlib.sha256(blockData.encode('utf-8'))
         return blockHash.hexdigest()
     
