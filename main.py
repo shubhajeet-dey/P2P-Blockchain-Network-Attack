@@ -13,7 +13,7 @@ if __name__ == "__main__":
 	nodes = int(inputs['nodes'])
 	z0 = float(inputs['z0'])
 	z1 = float(inputs['z1'])
-	T_tx = int(inputs['T_Tx'])
+	T_Tx = int(inputs['T_Tx'])
 	I  = int(inputs['I'])
 
 	# Initializing nodes and creating a P2P network

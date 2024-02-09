@@ -17,6 +17,7 @@ class Event:
         "create block at node i" --> ("create", "block")
         "broadcast block at node i" -->  ("broadcast", "block")
         "receive block at node i" --> ("receive", "block")
+
     '''
     def __init__(self, timestamp, createdBy, executedBy, eventObject, eventType):
         self.timestamp = timestamp
@@ -31,23 +32,23 @@ class Event:
 
     # Execute the Event based on eventType
     def execute(self, nodeArray):
-        if eventType[0] == "genesis":
+        if self.eventType[0] == "genesis":
             self.create_genisis_block(nodeArray)
 
-        elif eventType[0] == "create":
-            if eventType[1] == "TXN":
+        elif self.eventType[0] == "create":
+            if self.eventType[1] == "TXN":
                 self.create_transaction(nodeArray)
             else:
                 self.create_block(nodeArray)
 
-        elif eventType[0] == "broadcast":
-            if eventType[1] == "TXN":
+        elif self.eventType[0] == "broadcast":
+            if self.eventType[1] == "TXN":
                 self.broadcast_transaction(nodeArray)
             else:
                 self.broadcast_block(nodeArray)
 
         else:
-            if eventType[1] == "TXN":
+            if self.eventType[1] == "TXN":
                 self.receive_transaction(nodeArray)
             else:
                 self.receive_block(nodeArray)
