@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from transactions import TXN
 from block import Block
+import random
 
 # Event class
 class Event:
@@ -12,7 +13,6 @@ class Event:
     eventType: Type of event, possible types: 
         "genesis block creation" --> ("genesis")
         "create transaction at node i" --> ("create", "TXN")
-        "broadcast transaction at node i" --> ("broadcast", "TXN")
         "receive transaction at node i" --> ("receive", "TXN")
         "create block at node i" --> ("create", "block")
         "broadcast block at node i" -->  ("broadcast", "block")
@@ -33,7 +33,7 @@ class Event:
     # Execute the Event based on eventType
     def execute(self, nodeArray):
         if self.eventType[0] == "genesis":
-            self.create_genisis_block(nodeArray)
+            self.create_genesis_block(nodeArray)
 
         elif self.eventType[0] == "create":
             if self.eventType[1] == "TXN":
@@ -41,11 +41,8 @@ class Event:
             else:
                 self.create_block(nodeArray)
 
-        elif self.eventType[0] == "broadcast":
-            if self.eventType[1] == "TXN":
-                self.broadcast_transaction(nodeArray)
-            else:
-                self.broadcast_block(nodeArray)
+        elif self.eventType[0] == "broadcast" and self.eventType[1] == "block":
+            self.broadcast_block(nodeArray)
 
         else:
             if self.eventType[1] == "TXN":
@@ -53,7 +50,56 @@ class Event:
             else:
                 self.receive_block(nodeArray)
 
-    # Create genisis block
-    # def create_genisis_block(self, nodeArray):
+    # Create genesis block
+    def create_genesis_block(self, nodeArray):
+        genesisTransactions = []
 
+        # Adding a random amount from 500 - 1500 coins in each node
+        for i in range(len(nodeArray)):
+            amount = random.randint(500, 1500)
+            # Here -1 means initial amount given, by God
+            genesisTransactions.append(TXN(0, -1, nodeArray[i].nodeID, amount, False))
 
+        # Creating the genesis block
+        genesisBlock = Block(0, None, True, genesisTransactions)
+
+        # Adding the genesis block in each node
+        for i in range(len(nodeArray)):
+            nodeArray[i].blocksSeen[genesisBlock.blockHash] = { "arrival_time": 0, "Block": genesisBlock }
+            nodeArray[i].leafBlocks[genesisBlock.blockHash] = genesisBlock
+            for txn in genesisTransactions:
+                nodeArray[i].heardTXNs[txn.TXNID] = txn
+
+        futureEvents = []
+
+        # Adding future transactional events for all the nodes at timestamp 1
+        for i in range(len(nodeArray)):
+            futureEvents.append(Event(1, None, nodeArray[i].nodeID, None, ("create", "TXN")))
+
+        # Adding future create Block events for all the nodes at timestamp 1
+        for i in range(len(nodeArray)):
+            futureEvents.append(Event(1, None, nodeArray[i].nodeID, None, ("create", "block")))
+
+        # Random shuffling for randomness
+        random.shuffle(futureEvents)
+        return futureEvents
+
+    # Create transaction at node i
+    def create_transaction(self, nodeArray):
+        txn = nodeArray[self.executedBy].create_transaction(nodeArray, self.timestamp)
+        
+        futureEvents = []
+
+        # Transmit created transaction to peer nodes
+        for peer in nodeArray[self.executedBy].peers.keys():
+            # Calculating timestamp of the future event, size of txn is 1KB
+            future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(1, peer))
+
+            # Adding event to receive the transaction
+            futureEvents.append(Event(future_timestamp, self.executedBy, peer, txn, ("receive", "TXN")))
+
+        # Add event to create transaction after an exponential time gap (exponential interarrival time)
+        future_timestamp = self.timestamp + round(nodeArray[self.executedBy].next_create_transaction_delay())
+        futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, None, ("create", "TXN")))
+
+        return futureEvents
