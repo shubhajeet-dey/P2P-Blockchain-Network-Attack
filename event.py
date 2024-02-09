@@ -95,11 +95,54 @@ class Event:
             # Calculating timestamp of the future event, size of txn is 1KB
             future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(1, peer))
 
-            # Adding event to receive the transaction
+            # Adding event to receive the transaction at the peers
             futureEvents.append(Event(future_timestamp, self.executedBy, peer, txn, ("receive", "TXN")))
 
         # Add event to create transaction after an exponential time gap (exponential interarrival time)
         future_timestamp = self.timestamp + round(nodeArray[self.executedBy].next_create_transaction_delay())
         futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, None, ("create", "TXN")))
+
+        return futureEvents
+
+    # Receive transaction at node i
+    def receive_transaction(self, nodeArray):
+        # Retrieving the Transaction
+        txn = self.eventObject
+
+        # Loop-Less transaction forwarding
+        # Checking if the transaction is already heard at this node
+        # If heard then transaction is already processed (sent to peers) in the past
+        if txn.TXNID in nodeArray[self.executedBy].heardTXNs:
+            return
+
+        nodeArray[self.executedBy].receive_transaction(txn)
+
+        futureEvents = []
+
+        # Transmit received transaction to peer nodes
+        for peer in nodeArray[self.executedBy].peers.keys():
+            # The receive event is created by the transmitting node, so ignoring it for Loop-Less transaction forwarding
+            if peer == self.createdBy:
+                continue
+
+            # Calculating timestamp of the future event, size of txn is 1KB
+            future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(1, peer))
+
+            # Adding event to receive the transaction at the peers
+            futureEvents.append(Event(future_timestamp, self.executedBy, peer, txn, ("receive", "TXN")))
+
+        return futureEvents
+
+    # Create block at node i
+    def create_block(self, nodeArray):
+        block = nodeArray[self.executedBy].create_block(self.timestamp)
+
+        futureEvents = []
+
+        # Calculating timestamp of the future event (Broadcasting the created block after POW)
+        future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_POW_time())
+
+        # Adding broadcast event in the future
+        futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, block, ("broadcast", "block")))
 
         return futureEvents

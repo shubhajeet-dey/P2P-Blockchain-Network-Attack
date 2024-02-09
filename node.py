@@ -51,8 +51,13 @@ class Node:
 		total_latency = propagation_delay + (messageSize / link_speed) + queueing_delay
 		return total_latency
 
+	# Calculating next transaction time gap
 	def next_create_transaction_delay(self):
 		return np.random.exponential(scale=self.T_Tx)
+
+	# Calculating POW time (T_k)
+	def calculate_POW_time(self):
+		return np.random.exponential(scale=(self.PoWI / self.hashPower))
 
 	# Create a random transaction with random amount
 	def create_transaction(self, nodeArray, timestamp):
@@ -69,3 +74,13 @@ class Node:
 		self.heardTXNs[txn.TXNID] = txn
 
 		return txn
+
+	# Received a transaction from a peer
+	def receive_transaction(self, txn):
+		# Adding in seen transactions
+		self.heardTXNs[txn.TXNID] = txn
+
+	# Create Block
+	def create_block(self):
+		pass
+
