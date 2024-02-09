@@ -6,7 +6,8 @@ from generateNodesGraph import generate_node_connectivity_graph
 
 # Initialize Nodes and assign Slow, Fast, Low CPU and High CPU features.
 # PowI represents interarrival time between blocks on average
-def init_nodes(N, z0, z1, PoWI):
+# T_Tx represents the mean interarrival time between transactions
+def init_nodes(N, z0, z1, PoWI, T_Tx):
 	
 	nodeArray = []
 
@@ -40,7 +41,7 @@ def init_nodes(N, z0, z1, PoWI):
 			isLowCPU = True
 			hashPower = hashLowCPU
 
-		nodeArray.append(Node(i, isSlow, isLowCPU, hashPower, PoWI))
+		nodeArray.append(Node(i, isSlow, isLowCPU, hashPower, PoWI, T_Tx))
 
 	
 	# Creating a connected peer graph network
