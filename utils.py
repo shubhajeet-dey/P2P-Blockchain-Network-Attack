@@ -3,6 +3,21 @@ from collections import deque
 from numpy.random import uniform
 import random
 
+# Parsing the command line arguments
+def parseArguments(inputs):
+
+    if len(inputs) != 6:
+        print("Usage : python3 <filename.py> node z0 z1 T_Tx I\n")
+    else:
+        required_input = {
+            'nodes'             : inputs[1],
+            'z0'                : inputs[2],
+            'z1'                : inputs[3],
+            'T_Tx'              : inputs[4],
+            'I'                 : inputs[5],
+        }
+        return required_input
+
 # Assign Edge between node i and node j
 def assign_edge(nodeArray, i, j):
 
