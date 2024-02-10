@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import copy
 from block import Block
 from transactions import TXN
 import numpy as np
@@ -69,3 +70,45 @@ class Node:
 		self.heardTXNs[txn.TXNID] = txn
 
 		return txn
+
+	# Method to validate a block in a blockchain.
+	def validateBlock(self,block):
+		# Initialize an empty list to store transactions seen in the chain.
+		transactionsInChain = []
+		# Initialize an empty dictionary to store node balances.
+		nodeBalance = {}
+		# Continue looping indefinitely until a break condition is met.
+		while True:
+			# Get the transactions from the current block.
+			transactions = block.transactions
+			 # Get the hash of the previous block.
+			parentHash = block.previousBlock
+			# Get the parent block using the hash.
+			parentBlock = self.blocksSeen.get(parentHash)
+			# If genesis block, exit the loop.
+			if parentBlock is None:
+				break
+			# Iterate through each transaction in the block.
+			for t in transactions:
+				sender = t.fromNode
+				recipient = t.toNode
+				amount = t.amount
+				# If the transaction is not a coinbase transaction, update the node balances accordingly.
+				if not t.isCoinbase:
+					nodeBalance[sender] -= amount
+				nodeBalance[recipient] += amount
+				# Add the transaction to the list of transactions in the chain.
+				transactionsInChain.append(t)
+			# Update the current block to be the parent block for the next iteration.
+			block = copy.deepcopy(parentBlock)
+		
+		# Check if any node has a negative balance after processing all transactions.
+		for node, balance in nodeBalance.items():
+			if balance < 0 :
+				# If any node has a negative balance, return False and the list of transactions seen in the chain.
+				return False, transactionsInChain
+		# If all node balances are non-negative, return True and the list of transactions seen in the chain.
+		return  True, transactionsInChain
+
+		
+			

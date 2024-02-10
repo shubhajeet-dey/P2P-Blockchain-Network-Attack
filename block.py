@@ -25,6 +25,3 @@ class Block:
         blockData = str(self.timestamp) + txnStrings + ('' if self.isGenesis else self.prevBlockHash)
         blockHash = hashlib.sha256(blockData.encode('utf-8'))
         return blockHash.hexdigest()
-    
-    # def validateBlock(self):
-        
