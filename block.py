@@ -9,6 +9,7 @@ class Block:
     isGenesis: Boolean value stating whether this block is genesis block or not
     transactions: Set of transactions under this block (0th index stating coinbase)
     blockHash: Unique Identifier for each Block
+    depth: Depth of the block in the blockchain (Number of blocks in the chain before this block since genesis block (included))
 
     '''
     def __init__(self, timestamp, previousBlock, isGenesis, transactions) :
@@ -16,6 +17,9 @@ class Block:
         self.previousBlock = previousBlock
         if not isGenesis:
             self.prevBlockHash = previousBlock.blockHash
+            self.depth = previousBlock.depth + 1
+        else:
+            self.depth = 0
         self.isGenesis = isGenesis
         self.transactions = transactions
         self.blockHash = self.calculateBlockHash()
