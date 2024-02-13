@@ -76,50 +76,92 @@ class Node:
 
 		return txn
 
-	# Method to validate a block in a blockchain.
-	def validateBlock(self,block):
-		# Initialize an empty list to store transactions seen in the chain.
-		transactionsInChain = []
-		# Initialize an empty dictionary to store node balances.
-		nodeBalance = {}
-		# Continue looping indefinitely until a break condition is met.
-		while True:
-			# Get the transactions from the current block.
-			transactions = block.transactions
-			 # Get the hash of the previous block.
-			parentHash = block.previousBlock
-			# Get the parent block using the hash.
-			parentBlock = self.blocksSeen.get(parentHash)
-			# If genesis block, exit the loop.
-			if parentBlock is None:
-				break
-			# Iterate through each transaction in the block.
-			for t in transactions:
-				sender = t.fromNode
-				recipient = t.toNode
-				amount = t.amount
-				# If the transaction is not a coinbase transaction, update the node balances accordingly.
-				if not t.isCoinbase:
-					nodeBalance[sender] -= amount
-				nodeBalance[recipient] += amount
-				# Add the transaction to the list of transactions in the chain.
-				transactionsInChain.append(t)
-			# Update the current block to be the parent block for the next iteration.
-			block = copy.deepcopy(parentBlock)
-		
-		# Check if any node has a negative balance after processing all transactions.
-		for node, balance in nodeBalance.items():
-			if balance < 0 :
-				# If any node has a negative balance, return False and the list of transactions seen in the chain.
-				return False, transactionsInChain
-		# If all node balances are non-negative, return True and the list of transactions seen in the chain.
-		return  True, transactionsInChain
-
 	# Received a transaction from a peer
 	def receive_transaction(self, txn):
 		# Adding in seen transactions
 		self.heardTXNs[txn.TXNID] = txn
 
+	# Verifying the transaction
+	def verify_txn(self, nodeBalance, txn):
+		# Adding and updating balances serially ensures no double spend happens within a block
+		if nodeBalance[txn.fromNode] >= txn.amount:
+			nodeBalance[txn.fromNode] -= txn.amount
+			nodeBalance[txn.toNode] += txn.amount
+			return True
+		else:
+			return False
+
 	# Create Block
-	def create_block(self):
-		pass
+	def create_block(self, timestamp):
+		
+		# Finding the Longest chain the Block Tree, Maximum depth leaf node
+		longestChainLeaf = None
+		maxDepth = 0
+
+		# To allow randomness in choosing 2 equal depth blocks
+		leafBlocksKeys = self.leafBlocks.keys() 
+		random.shuffle(leafBlocksKeys)
+
+		for leafBlock in leafBlocksKeys:
+			if self.leafBlocks[leafBlock].depth > maxDepth:
+				maxDepth = self.leafBlocks[leafBlock].depth
+				longestChainLeaf = self.leafBlocks[leafBlock]
+
+		# Getting transaction details about the longest chain
+		nodeBalance, transactionsInChain = self.get_details_longest_chain(longestChainLeaf)
+
+		# Adding Randomness in TXN subset selection
+		heardTXNsKeys = self.heardTXNs.keys()
+		random.shuffle(heardTXNsKeys)
+
+		# Randomly selecting number of TXNs to added into the block, minimum = 0 transactions, maximum = min( number of transactions not included in any blocks in the longest chain, 999 ). 999 txns as 1MB max block size.
+		noOfTXNs = random.randint(0, min(len(heardTXNsKeys) - len(transactionsInChain), 999))
+		
+		transactions = []
+
+		# Adding the coinbase transaction, at 0th index
+		transactions.append(TXN(timestamp, None, self.nodeID, 50, True))
+		
+		cnt = 0
+		while(noOfTXNs and cnt < len(heardTXNsKeys)):
+
+			# If transaction is not included in any blocks in the longest chain and If transaction is valid then add to the block
+			if (heardTXNsKeys[cnt] not in transactionsInChain) and self.verify_txn(nodeBalance, heardTXNs[heardTXNsKeys[cnt]]):
+				transactions.append(heardTXNs[heardTXNsKeys[cnt]])
+				noOfTXNs -= 1
+
+			cnt += 1
+
+		# Create block based on transactions and longest chain leaf node
+		block = Block(timestamp, longestChainLeaf, False, transactions)
+
+		return block
+
+	# Get all the transaction details about the longest chain
+	def get_details_longest_chain(self, block):
+		# Initialize an empty list to store transactions seen in the chain.
+		transactionsInChain = []
+		# Initialize an empty dictionary to store node balances.
+		nodeBalance = dict()
+		# Continue looping indefinitely until condition is met.
+		currBlock = block
+		while currBlock:
+			# Get the transactions from the current block.
+			transactions = currBlock.transactions
+
+			# Iterate through each transaction in the block.
+			for txn in transactions:
+				sender = txn.fromNode
+				recipient = txn.toNode
+				amount = txn.amount
+				# If the transaction is not a coinbase transaction, update the node balances accordingly.
+				if not txn.isCoinbase:
+					nodeBalance[sender] -= amount
+				nodeBalance[recipient] += amount
+				# Add the transaction to the list of transactions in the chain.
+				transactionsInChain.append(txn.TXNID)
+			# Update the current block to be the parent block for the next iteration. If genesis block then parent will be None, so loop exit
+			parentBlock = currBlock.previousBlock
+			currBlock = parentBlock
+		
+		return  nodeBalance, transactionsInChain
