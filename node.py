@@ -135,7 +135,39 @@ class Node:
 		# Create block based on transactions and longest chain leaf node
 		block = Block(timestamp, longestChainLeaf, False, transactions)
 
+		# Mining starts
+		self.status = "mining"
+
 		return block
+
+	# Broadcast Block
+	def broadcast_block(self, block, timestamp):
+		# Finding the Longest chain the Block Tree, Maximum depth leaf node, to verify if it is still the longest
+		longestChainLeaf = None
+		maxDepth = 0
+
+		parentBlockHash = block.prevBlockHash
+
+		for leafBlock in self.leafBlocks.keys():
+			if self.leafBlocks[leafBlock].depth > maxDepth:
+				maxDepth = self.leafBlocks[leafBlock].depth
+				longestChainLeaf = self.leafBlocks[leafBlock]
+
+		# Checking the block still extends the longest
+		if(not (longestChainLeaf.blockHash == parentBlockHash) ):
+			return False
+
+		# Adding block to block Tree
+		self.blocksSeen[block.blockHash] = { "arrival_time": timestamp, "Block": block}
+
+		# Removing parent block as leaf node and adding current block as leaf node
+		self.leafBlocks.pop(parentBlockHash)
+		self.leafBlocks[block.blockHash] = block
+
+		# Free from Mining
+		self.status = "free"
+
+		return True
 
 	# Get all the transaction details about the longest chain
 	def get_details_longest_chain(self, block):

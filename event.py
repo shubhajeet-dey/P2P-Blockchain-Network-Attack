@@ -135,6 +135,11 @@ class Event:
 
     # Create block at node i
     def create_block(self, nodeArray):
+        
+        # Node is busy mining other block (not free)
+        if not (nodeArray[self.executedBy].status == "free"):
+            return []
+
         block = nodeArray[self.executedBy].create_block(self.timestamp)
 
         futureEvents = []
@@ -147,4 +152,29 @@ class Event:
 
         return futureEvents
 
-    
+    # Broadcast block at node i
+    def broadcast_block(self, nodeArray):
+        # Retrieving the Block
+        block = self.eventObject
+
+        futureEvents = []
+
+        # If the same longest chain, broadcast the block
+        if nodeArray[self.executedBy].broadcast_block(block, self.timestamp):
+
+            # Size of the block in KBs
+            blockSize = len(block.transactions)
+
+            # Broadcast the new block to the peer nodes
+            for peer in nodeArray[self.executedBy].peers.keys():
+
+                # Calculating timestamp of the future event depending size of block
+                future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
+
+                # Adding event to receive the block at the peers
+                futureEvents.append(Event(future_timestamp, self.executedBy, peer, block, ("receive", "block")))
+
+        # Adding an block creation event at same timestamp (broadcast event over)
+        futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))
+
+        return futureEvents
