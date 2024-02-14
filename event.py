@@ -113,7 +113,7 @@ class Event:
         # Checking if the transaction is already heard at this node
         # If heard then transaction is already processed (sent to peers) in the past
         if txn.TXNID in nodeArray[self.executedBy].heardTXNs:
-            return
+            return []
 
         nodeArray[self.executedBy].receive_transaction(txn)
 
@@ -175,6 +175,43 @@ class Event:
                 futureEvents.append(Event(future_timestamp, self.executedBy, peer, block, ("receive", "block")))
 
         # Adding an block creation event at same timestamp (broadcast event over)
+        futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))
+
+        return futureEvents
+
+    # Receive block at node i
+    def receive_block(self, nodeArray):
+        # Retrieving the Block
+        block = self.eventObject
+
+        # Loop-Less Block forwarding
+        # Checking if the block is already heard at this node
+        # If heard then block is already processed (validated and sent to peers) in the past
+        if block.blockHash in nodeArray[self.executedBy].blocksSeen:
+            return []
+
+        futureEvents = []
+
+        # If valid block then transmit to peers
+        if nodeArray[self.executedBy].validate_block(self.timestamp, block):
+
+             # Size of the block in KBs
+            blockSize = len(block.transactions)
+
+            # Transmitting the block to the peer nodes
+            for peer in nodeArray[self.executedBy].peers.keys():
+
+                # The receive event is created by the transmitting node, so ignoring it for Loop-Less Block forwarding
+                if peer == self.createdBy:
+                    continue
+
+                # Calculating timestamp of the future event depending size of block
+                future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
+
+                # Adding event to receive the block at the peers
+                futureEvents.append(Event(future_timestamp, self.executedBy, peer, block, ("receive", "block")))
+
+        # Adding an block creation event at same timestamp (validation event over)
         futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))
 
         return futureEvents
