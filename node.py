@@ -108,7 +108,7 @@ class Node:
 				longestChainLeaf = self.leafBlocks[leafBlock]
 
 		# Getting transaction details about the longest chain
-		nodeBalance, transactionsInChain = self.get_details_longest_chain(longestChainLeaf)
+		nodeBalance, transactionsInChain = self.get_details_chain(longestChainLeaf)
 
 		# Adding Randomness in TXN subset selection
 		heardTXNsKeys = self.heardTXNs.keys()
@@ -169,8 +169,52 @@ class Node:
 
 		return True
 
-	# Get all the transaction details about the longest chain
-	def get_details_longest_chain(self, block):
+	# Validate Block
+	def validate_block(self, timestamp, block):
+		# Getting parent block of the node
+		parentBlock = block.previousBlock
+
+		# If parent not in block tree, return false (cannot validate)
+		if parentBlock.blockHash not in self.blocksSeen:
+			return False
+
+		# Getting transaction details about the parent block
+		nodeBalance, transactionsInChain = self.get_details_chain(parentBlock)
+
+		# Validating the Transactions
+		for txn in block.transactions:
+			# If coinbase transaction amount is not 50, return False
+			if txn.isCoinbase:
+				if txn.amount != 50:
+					return False
+				continue
+
+			# If transaction invalid, return False
+			if not self.verify_txn(nodeBalance, txn):
+				return False
+
+		# All transactions Validated
+		# Adding block into the block tree
+		self.blocksSeen[block.blockHash] = { "arrival_time": timestamp, "Block": block }
+
+		# Add block as a leaf node (no block pointing to the current block), and remove parent as leaf node as current block is pointing towards it
+		if parentBlock.blockHash in self.leafBlocks:
+			self.leafBlocks.pop(parentBlock.blockHash)
+			self.leafBlocks[block.blockHash] = block
+		else:
+			self.leafBlocks[block.blockHash] = block
+
+		# Adding transactions in block into heardTXNs
+		for txn in block.transactions:
+			if not txn.isCoinbase:
+				heardTXNs[txn.TXNID] = txn
+
+		return True
+
+
+
+	# Get all the transaction details about the chain from a block
+	def get_details_chain(self, block):
 		# Initialize an empty list to store transactions seen in the chain.
 		transactionsInChain = []
 		# Initialize an empty dictionary to store node balances.
