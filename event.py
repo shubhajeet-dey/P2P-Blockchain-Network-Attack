@@ -23,7 +23,7 @@ class Event:
         self.timestamp = timestamp
         self.createdBy = createdBy
         self.executedBy = executedBy
-        self.eventOject = eventObject
+        self.eventObject = eventObject
         self.eventType = eventType
 
     # Comparator function for priority queue (sorted by increasing order of timestamp)
@@ -33,22 +33,22 @@ class Event:
     # Execute the Event based on eventType
     def execute(self, nodeArray):
         if self.eventType[0] == "genesis":
-            self.create_genesis_block(nodeArray)
+            return self.create_genesis_block(nodeArray)
 
         elif self.eventType[0] == "create":
             if self.eventType[1] == "TXN":
-                self.create_transaction(nodeArray)
+                return self.create_transaction(nodeArray)
             else:
-                self.create_block(nodeArray)
+                return self.create_block(nodeArray)
 
         elif self.eventType[0] == "broadcast" and self.eventType[1] == "block":
-            self.broadcast_block(nodeArray)
+            return self.broadcast_block(nodeArray)
 
         else:
             if self.eventType[1] == "TXN":
-                self.receive_transaction(nodeArray)
+                return self.receive_transaction(nodeArray)
             else:
-                self.receive_block(nodeArray)
+                return self.receive_block(nodeArray)
 
     # Create genesis block
     def create_genesis_block(self, nodeArray):
@@ -140,7 +140,7 @@ class Event:
         if not (nodeArray[self.executedBy].status == "free"):
             return []
 
-        block = nodeArray[self.executedBy].create_block(self.timestamp)
+        block = nodeArray[self.executedBy].create_block(self.timestamp, nodeArray)
 
         futureEvents = []
 
@@ -193,7 +193,7 @@ class Event:
         futureEvents = []
 
         # If valid block then transmit to peers
-        if nodeArray[self.executedBy].validate_block(self.timestamp, block):
+        if nodeArray[self.executedBy].validate_block(self.timestamp, block, nodeArray):
 
              # Size of the block in KBs
             blockSize = len(block.transactions)

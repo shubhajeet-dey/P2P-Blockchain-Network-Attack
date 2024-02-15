@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
 	# Initializing the event queue with genesis block creation event
 	eventQueue = []
-	eventQueue.append(Event(0, None, None, None, ("genesis")))
+	eventQueue.append(Event(0, None, None, None, ("genesis",)))
 
 	# Using heapq module to simulate min heap (using timestamps)
 	heapq.heapify(eventQueue)

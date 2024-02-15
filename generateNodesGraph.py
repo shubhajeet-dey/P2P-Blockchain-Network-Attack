@@ -24,7 +24,7 @@ def generate_node_connectivity_graph(nodeArray):
     plt.savefig("node_connectivity_graph.png")
 
     # To Show the graph
-    plt.show()
+    plt.show(block=False)
 
 
 def generate_blockchain_graph_of_one_node(node):
