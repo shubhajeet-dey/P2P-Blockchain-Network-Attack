@@ -11,6 +11,10 @@ if __name__ == "__main__":
 	# Parse here 
 	inputs = parseArguments(deepcopy(sys.argv)) #this parses the command line argument into the parseArgument function which returns the arguments in the form of dictionary
 
+	# In correct input arguments
+	if inputs is None:
+		sys.exit()
+
 	# I and T_Tx are given in milliseconds
 	nodes = int(inputs['nodes'])
 	z0 = float(inputs['z0'])
