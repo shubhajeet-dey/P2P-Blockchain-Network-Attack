@@ -29,23 +29,44 @@ def init_nodes(N, z0, z1, PoWI, T_Tx):
 	hashHighCPU = 10 * hashLowCPU
 
 	# Initializing the Node objects
-	for i in range(len(nodeIDs)):
+	nodeIDs.sort()
+	for nodeID in nodeIDs:
 		
 		isSlow = False
-		if nodeIDs[i] in slowNodes:
+		if nodeID in slowNodes:
 			isSlow = True
 
 		isLowCPU = False
 		hashPower = hashHighCPU
-		if nodeIDs[i] in lowCPUNodes:
+		if nodeID in lowCPUNodes:
 			isLowCPU = True
 			hashPower = hashLowCPU
 
-		nodeArray.append(Node(i, isSlow, isLowCPU, hashPower, PoWI, T_Tx))
+		nodeArray.append(Node(nodeID, isSlow, isLowCPU, hashPower, PoWI, T_Tx))
 
 	
+	print("Creating Node graph!")
+
 	# Creating a connected peer graph network
 	gen_graph(nodeArray)
+
+	# Printing Initialization details
+	print("")
+	print("Node Information:")
+	print("Node ID range: 0 ... " + str(N-1))
+	print("Slow Nodes: ", slowNodes)
+	print("Fast Nodes: ", fastNodes)
+	print("")
+	print("Low CPU Nodes: ", lowCPUNodes)
+	print("High CPU Nodes: ", highCPUNodes)
+	print("")
+	print("Hash power for Low CPU Nodes: " + str(hashLowCPU))
+	print("Hash power for High CPU Nodes: " + str(hashHighCPU))
+	print("")
+	print("Peers Information: ")
+	for nodeID in nodeIDs:
+		print("Node " + str(nodeID) + " : ", list(nodeArray[nodeID].peers.keys()))
+	print("")
 
 	return nodeArray
 

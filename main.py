@@ -26,6 +26,7 @@ if __name__ == "__main__":
 	# Initializing nodes and creating a P2P network
 	nodeArray = init_nodes(nodes, z0, z1, I, T_Tx)
 
+	print("============= Starting Simulation =============")
 
 	# Initializing the event queue with genesis block creation event
 	eventQueue = []
