@@ -83,6 +83,12 @@ class Node:
 
 	# Verifying the transaction
 	def verify_txn(self, nodeBalance, txn):
+
+		# This is a genesis block transaction (initial amount)
+		if txn.fromNode == -1:
+			nodeBalance[txn.toNode] += txn.amount
+			return True
+
 		# Adding and updating balances serially ensures no double spend happens within a block
 		if nodeBalance[txn.fromNode] >= txn.amount:
 			nodeBalance[txn.fromNode] -= txn.amount
@@ -92,14 +98,14 @@ class Node:
 			return False
 
 	# Create Block
-	def create_block(self, timestamp):
+	def create_block(self, timestamp, nodeArray):
 		
 		# Finding the Longest chain the Block Tree, Maximum depth leaf node
 		longestChainLeaf = None
-		maxDepth = 0
+		maxDepth = -1
 
 		# To allow randomness in choosing 2 equal depth blocks
-		leafBlocksKeys = self.leafBlocks.keys() 
+		leafBlocksKeys = list(self.leafBlocks.keys()) 
 		random.shuffle(leafBlocksKeys)
 
 		for leafBlock in leafBlocksKeys:
@@ -108,10 +114,10 @@ class Node:
 				longestChainLeaf = self.leafBlocks[leafBlock]
 
 		# Getting transaction details about the longest chain
-		nodeBalance, transactionsInChain = self.get_details_chain(longestChainLeaf)
+		nodeBalance, transactionsInChain = self.get_details_chain(longestChainLeaf, nodeArray)
 
 		# Adding Randomness in TXN subset selection
-		heardTXNsKeys = self.heardTXNs.keys()
+		heardTXNsKeys = list(self.heardTXNs.keys())
 		random.shuffle(heardTXNsKeys)
 
 		# Randomly selecting number of TXNs to added into the block, minimum = 0 transactions, maximum = min( number of transactions not included in any blocks in the longest chain, 999 ). 999 txns as 1MB max block size.
@@ -126,8 +132,8 @@ class Node:
 		while(noOfTXNs and cnt < len(heardTXNsKeys)):
 
 			# If transaction is not included in any blocks in the longest chain and If transaction is valid then add to the block
-			if (heardTXNsKeys[cnt] not in transactionsInChain) and self.verify_txn(nodeBalance, heardTXNs[heardTXNsKeys[cnt]]):
-				transactions.append(heardTXNs[heardTXNsKeys[cnt]])
+			if (heardTXNsKeys[cnt] not in transactionsInChain) and self.verify_txn(nodeBalance, self.heardTXNs[heardTXNsKeys[cnt]]):
+				transactions.append(self.heardTXNs[heardTXNsKeys[cnt]])
 				noOfTXNs -= 1
 
 			cnt += 1
@@ -144,7 +150,7 @@ class Node:
 	def broadcast_block(self, block, timestamp):
 		# Finding the Longest chain the Block Tree, Maximum depth leaf node, to verify if it is still the longest
 		longestChainLeaf = None
-		maxDepth = 0
+		maxDepth = -1
 
 		parentBlockHash = block.prevBlockHash
 
@@ -170,7 +176,7 @@ class Node:
 		return True
 
 	# Validate Block
-	def validate_block(self, timestamp, block):
+	def validate_block(self, timestamp, block, nodeArray):
 		# Getting parent block of the node
 		parentBlock = block.previousBlock
 
@@ -179,7 +185,7 @@ class Node:
 			return False
 
 		# Getting transaction details about the parent block
-		nodeBalance, transactionsInChain = self.get_details_chain(parentBlock)
+		nodeBalance, transactionsInChain = self.get_details_chain(parentBlock, nodeArray)
 
 		# Validating the Transactions
 		for txn in block.transactions:
@@ -207,18 +213,21 @@ class Node:
 		# Adding transactions in block into heardTXNs
 		for txn in block.transactions:
 			if not txn.isCoinbase:
-				heardTXNs[txn.TXNID] = txn
+				self.heardTXNs[txn.TXNID] = txn
 
 		return True
 
 
 
 	# Get all the transaction details about the chain from a block
-	def get_details_chain(self, block):
+	def get_details_chain(self, block, nodeArray):
 		# Initialize an empty list to store transactions seen in the chain.
 		transactionsInChain = []
-		# Initialize an empty dictionary to store node balances.
+		# Initialize an dictionary to store node balances.
 		nodeBalance = dict()
+		for node in nodeArray:
+			nodeBalance[node.nodeID] = 0
+		nodeBalance[-1] = 0
 		# Continue looping indefinitely until condition is met.
 		currBlock = block
 		while currBlock:
