@@ -3,7 +3,7 @@ from initialize import init_nodes
 from utils import parseArguments
 from copy import deepcopy
 from event import Event
-from generateNodesGraph import generate_blockchain_graph_visualization
+from generateNodesGraph import generate_blockchain_graph_visualization, generate_records_of_all_nodes
 import sys
 import heapq
 
@@ -53,3 +53,4 @@ if __name__ == "__main__":
 		cnt = cnt + 1
 
 	generate_blockchain_graph_visualization(nodeArray)
+	generate_records_of_all_nodes(nodeArray)
