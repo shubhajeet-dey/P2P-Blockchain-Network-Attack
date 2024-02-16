@@ -3,6 +3,7 @@ from initialize import init_nodes
 from utils import parseArguments
 from copy import deepcopy
 from event import Event
+from generateNodesGraph import generate_blockchain_graph_visualization
 import sys
 import heapq
 
@@ -50,3 +51,5 @@ if __name__ == "__main__":
 
 		# Incrementing count
 		cnt = cnt + 1
+
+	generate_blockchain_graph_visualization(nodeArray)
