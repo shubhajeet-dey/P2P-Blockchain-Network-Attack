@@ -8,6 +8,7 @@ def parseArguments(inputs):
 
     if len(inputs) != 7:
         print("Usage : python3 <filename.py> node z0 z1 T_Tx I maxEventLoop\n")
+        return None
     else:
         required_input = {
             'nodes'             : inputs[1],

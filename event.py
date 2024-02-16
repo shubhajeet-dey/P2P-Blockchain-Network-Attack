@@ -32,6 +32,10 @@ class Event:
 
     # Execute the Event based on eventType
     def execute(self, nodeArray):
+
+        # Printing to terminal
+        print("Event: " + self.eventType[0] + (" block creation : " if self.eventType[0] == "genesis" else " " + self.eventType[1] + " at node " + str(self.executedBy) + " : "), end='')
+        
         if self.eventType[0] == "genesis":
             return self.create_genesis_block(nodeArray)
 
@@ -82,6 +86,9 @@ class Event:
 
         # Random shuffling for randomness
         random.shuffle(futureEvents)
+
+        print("Successful!")
+
         return futureEvents
 
     # Create transaction at node i
@@ -102,6 +109,8 @@ class Event:
         future_timestamp = self.timestamp + round(nodeArray[self.executedBy].next_create_transaction_delay())
         futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, None, ("create", "TXN")))
 
+        print("Successful!")
+
         return futureEvents
 
     # Receive transaction at node i
@@ -113,6 +122,7 @@ class Event:
         # Checking if the transaction is already heard at this node
         # If heard then transaction is already processed (sent to peers) in the past
         if txn.TXNID in nodeArray[self.executedBy].heardTXNs:
+            print("Already Heard!")
             return []
 
         nodeArray[self.executedBy].receive_transaction(txn)
@@ -131,6 +141,8 @@ class Event:
             # Adding event to receive the transaction at the peers
             futureEvents.append(Event(future_timestamp, self.executedBy, peer, txn, ("receive", "TXN")))
 
+        print("Successful!")
+
         return futureEvents
 
     # Create block at node i
@@ -138,6 +150,7 @@ class Event:
         
         # Node is busy mining other block (not free)
         if not (nodeArray[self.executedBy].status == "free"):
+            print("Node busy!")
             return []
 
         block = nodeArray[self.executedBy].create_block(self.timestamp, nodeArray)
@@ -149,6 +162,8 @@ class Event:
 
         # Adding broadcast event in the future
         futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, block, ("broadcast", "block")))
+
+        print("Successful!")
 
         return futureEvents
 
@@ -174,6 +189,10 @@ class Event:
                 # Adding event to receive the block at the peers
                 futureEvents.append(Event(future_timestamp, self.executedBy, peer, block, ("receive", "block")))
 
+            print("Successful!")
+        else:
+            print("Failed! (Not Longest Chain)")
+
         # Adding an block creation event at same timestamp (broadcast event over)
         futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))
 
@@ -188,6 +207,7 @@ class Event:
         # Checking if the block is already heard at this node
         # If heard then block is already processed (validated and sent to peers) in the past
         if block.blockHash in nodeArray[self.executedBy].blocksSeen:
+            print("Already Heard!")
             return []
 
         futureEvents = []
@@ -210,6 +230,10 @@ class Event:
 
                 # Adding event to receive the block at the peers
                 futureEvents.append(Event(future_timestamp, self.executedBy, peer, block, ("receive", "block")))
+
+            print("Successful!")
+        else:
+            print("Failed! Invalid Block")
 
         # Adding an block creation event at same timestamp (validation event over)
         futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))

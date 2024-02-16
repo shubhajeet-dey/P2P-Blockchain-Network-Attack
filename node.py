@@ -241,10 +241,10 @@ class Node:
 				amount = txn.amount
 				# If the transaction is not a coinbase transaction, update the node balances accordingly.
 				if not txn.isCoinbase:
+					# Add the transaction to the list of transactions in the chain.
+					transactionsInChain.append(txn.TXNID)
 					nodeBalance[sender] -= amount
 				nodeBalance[recipient] += amount
-				# Add the transaction to the list of transactions in the chain.
-				transactionsInChain.append(txn.TXNID)
 			# Update the current block to be the parent block for the next iteration. If genesis block then parent will be None, so loop exit
 			parentBlock = currBlock.previousBlock
 			currBlock = parentBlock

@@ -3,6 +3,7 @@ from initialize import init_nodes
 from utils import parseArguments
 from copy import deepcopy
 from event import Event
+from generateNodesGraph import generate_blockchain_graph_visualization
 import sys
 import heapq
 
@@ -10,6 +11,10 @@ if __name__ == "__main__":
 	
 	# Parse here 
 	inputs = parseArguments(deepcopy(sys.argv)) #this parses the command line argument into the parseArgument function which returns the arguments in the form of dictionary
+
+	# In correct input arguments
+	if inputs is None:
+		sys.exit()
 
 	# I and T_Tx are given in milliseconds
 	nodes = int(inputs['nodes'])
@@ -22,6 +27,7 @@ if __name__ == "__main__":
 	# Initializing nodes and creating a P2P network
 	nodeArray = init_nodes(nodes, z0, z1, I, T_Tx)
 
+	print("============= Starting Simulation =============")
 
 	# Initializing the event queue with genesis block creation event
 	eventQueue = []
@@ -45,3 +51,5 @@ if __name__ == "__main__":
 
 		# Incrementing count
 		cnt = cnt + 1
+
+	generate_blockchain_graph_visualization(nodeArray)
