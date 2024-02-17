@@ -15,6 +15,7 @@ class Node:
 	PoWI: The interarrival time between blocks on average
 	T_Tx: The mean interarrival time between transactions
 	status: Status of miner, possible status: {"free", "mining"}
+	cntSuccessfulBlocks: Count of successfully mined blocks created by this node in the block tree
 	blocksSeen: Dictionary of blocks present in the Node's Blockchain Tree, Structure = { BlockID (BlockHash): { "arrival_time": ~ , "Block": Block Object }, ... }
 	leafBlocks: Dictionary of blocks which are leaf nodes in the Node's Blockchain Tree, Structure = { BlockID (BlockHash): Block Object, ...}
 	peers: Contains information about the peers of the nodes, Structure = { Peer's NodeID : [ Peer's Node Object, propagation delay (rho_ij), link speed (c_ij) ], ... }
@@ -30,6 +31,7 @@ class Node:
 		self.PoWI = PoWI
 		self.T_Tx = T_Tx
 		self.status = "free"
+		self.cntSuccessfulBlocks = 0
 		self.blocksSeen = dict()
 		self.leafBlocks = dict()
 		self.peers = dict()
@@ -172,6 +174,9 @@ class Node:
 
 		# Free from Mining
 		self.status = "free"
+
+		# Incrementing the count as the block is successfully created
+		self.cntSuccessfulBlocks += 1
 
 		return True
 

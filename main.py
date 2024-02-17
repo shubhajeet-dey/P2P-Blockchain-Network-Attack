@@ -6,6 +6,17 @@ from event import Event
 from generateNodesGraph import generate_blockchain_graph_visualization, generate_records_of_all_nodes
 import sys
 import heapq
+import os
+
+def cleanup():
+	for file in os.listdir('./Results/BlockChains/PDF'):
+		os.remove('./Results/BlockChains/PDF/'+file)
+	for file in os.listdir('./Results/BlockChains/PNG'):
+		os.remove('./Results/BlockChains/PNG/'+file)
+	for file in os.listdir('./Results/Records/HTML'):
+		os.remove('./Results/Records/HTML/'+file)
+	for file in os.listdir('./Results/Records/txt'):
+		os.remove('./Results/Records/txt/'+file)
 
 if __name__ == "__main__":
 	
@@ -51,6 +62,10 @@ if __name__ == "__main__":
 
 		# Incrementing count
 		cnt = cnt + 1
+
+	print("============= Ending Simulation =============\n\n")
+	cleanup()
+	print("Storing the information in multiple files (HTML, PDF, TXT)......")
 
 	generate_blockchain_graph_visualization(nodeArray)
 	generate_records_of_all_nodes(nodeArray)
