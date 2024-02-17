@@ -163,6 +163,8 @@ class Node:
 
 		# Checking the block still extends the longest
 		if(not (longestChainLeaf.blockHash == parentBlockHash) ):
+			# Free from Mining
+			self.status = "free"
 			return False
 
 		# Adding block to block Tree
