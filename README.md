@@ -25,7 +25,7 @@ python3 main.py node z0 z1 T_Tx I maxEventLoop
 ```
 
 # Results
-View results in ./Results:
-BlockChains ==> Block Tree Diagrams for each node in PDF and PNG format
-GraphOfNodes ==> Peer graph
+View results in ./Results:\
+BlockChains ==> Block Tree Diagrams for each node in PDF and PNG format\
+GraphOfNodes ==> Peer graph\
 Records ==> Records about each node in HTML and TXT format
