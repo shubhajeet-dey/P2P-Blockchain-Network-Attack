@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from node import Node
 from utils import create_graph, connected_graph
-import random
 from generateNodesGraph import generate_node_connectivity_graph
+import random
 
 # Initialize Nodes and assign Slow, Fast, Low CPU and High CPU features.
 # PowI represents interarrival time between blocks on average

@@ -53,18 +53,28 @@ def create_graph(nodeArray):
 
 		# Now, randomly select the number of peers to be added
 		addPeers = random.randint(1, max_remaining_peers)
-
+		
+		i = 1
 		# Random Shuffle introduces randomness, even when looping sequentially
-		for i in range(1, min(addPeers+1, len(nodePeers))):
+		while(i < len(nodePeers) and addPeers > 0):
+
+			# If node is already a peer of the first node, continue
+			if nodePeers[i][0] in nodeArray[nodePeers[0][0]].peers:
+				i += 1
+				continue
 
 			# If this node has less than 6 peers then add
 			if(nodePeers[i][1] < 6):
 				nodePeers[i][1] = nodePeers[i][1] + 1
 				nodePeers[0][1] = nodePeers[0][1] + 1
 				assign_edge(nodeArray, nodePeers[0][0], nodePeers[i][0])
+				addPeers -= 1
 			else:
 			# If equal to 6, then next following nodes will also have 6 peers (as sorted) 
-				break 
+				break
+
+			i += 1
+
 		
 		# Sort nodes based on number of peers, random shuffle to ensure randomness
 		random.shuffle(nodePeers)
