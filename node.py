@@ -106,7 +106,7 @@ class Node:
 		longestChainLeaf = None
 		maxDepth = -1
 
-		# To allow randomness in choosing 2 equal depth blocks
+		# To allow randomness in choosing 2 equal depth blocks (resolution of forks)
 		leafBlocksKeys = list(self.leafBlocks.keys()) 
 		random.shuffle(leafBlocksKeys)
 

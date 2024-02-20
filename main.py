@@ -29,6 +29,12 @@ if __name__ == "__main__":
 
 	# I and T_Tx are given in milliseconds
 	nodes = int(inputs['nodes'])
+
+	if nodes <= 3:
+		print("Node graph cannot be form using the given conditions (6 >= noOfPeers >= 3)!!!!")
+		print("!!!!Exiting!!!!")
+		sys.exit()
+
 	z0 = float(inputs['z0'])
 	z1 = float(inputs['z1'])
 	T_Tx = int(inputs['T_Tx'])

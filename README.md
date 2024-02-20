@@ -19,8 +19,8 @@ python3 main.py node z0 z1 T_Tx I maxEventLoop
 # node: Number of Nodes
 # z0: Value of z0 (0 < z0 < 1)
 # z1: Value of z1 (0< z1 < 1)
-# T_Tx: Value of T_Tx
-# I: Value of I
+# T_Tx: Value of T_Tx in milliseconds
+# I: Value of I in milliseconds
 # maxEventLoop: Number of times the event loop should run
 ```
 

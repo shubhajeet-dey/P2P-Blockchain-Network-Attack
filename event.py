@@ -34,7 +34,7 @@ class Event:
     def execute(self, nodeArray):
 
         # Printing to terminal
-        print("EVENT: Timestamp: " + str(self.timestamp) + ", Type: " + self.eventType[0] + (" block creation : " if self.eventType[0] == "genesis" else " " + self.eventType[1] + " at node " + str(self.executedBy) + " : "), end='')
+        print("EVENT: Timestamp: " + str(self.timestamp) + " milliseconds, Type: " + self.eventType[0] + (" block creation : " if self.eventType[0] == "genesis" else " " + self.eventType[1] + " at node " + str(self.executedBy) + " : "), end='')
         
         if self.eventType[0] == "genesis":
             return self.create_genesis_block(nodeArray)
