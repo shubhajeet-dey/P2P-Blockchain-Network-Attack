@@ -7,53 +7,65 @@ Node Categeory:
 
 	Processing Power: High CPU
 
-Hashing Power Fraction: 0.3125
+Hashing Power Fraction: 0.2702702702702703
 
-PoWI: The interarrival time between blocks on average is 6000 miliseconds
+PoWI: The interarrival time between blocks on average is 5000 miliseconds
 
-T_Tx: The mean interarrival time between transactions is 6000 miliseconds
+T_Tx: The mean interarrival time between transactions is 500 miliseconds
 
 #############################################################################################################################################################
 
 Peers Information: 
 
-No of Peers Nodes: 4
-Peers are:[2, 4, 1, 3]
+No of Peers Nodes: 3
+Peers are:[5, 4, 8]
 
 #############################################################################################################################################################
 
 
 Information of Blocks on this node: 
 
-No. of Blocks on this node: 5
-Blocks Adjacency List: {'571b7739e183f019704a39025c313463feffff7db3ba2e3a8de6f441ddb64f70': [], '426367a4803e72b26602a7234426b2df355cb43d0c7f356355cc47231c57d297': ['571b7739e183f019704a39025c313463feffff7db3ba2e3a8de6f441ddb64f70'], 'e979deb115b73f3d078e1dd2972660e7084ba251faed5185096b07354f6d374c': ['426367a4803e72b26602a7234426b2df355cb43d0c7f356355cc47231c57d297'], 'c588c930842b31c818cd54f85509e850bf1bf315e59b437154f11777762fb4cd': ['e979deb115b73f3d078e1dd2972660e7084ba251faed5185096b07354f6d374c'], 'ffe22f2bf430b883b02bc82e1bdc3566b6fd39346edd1908884ebf55c52be085': ['c588c930842b31c818cd54f85509e850bf1bf315e59b437154f11777762fb4cd']}
+No. of Blocks on this node: 17
+Blocks Adjacency List: {'02a5d2405bd21ba746976426478f1eb1c0aae044ba106ee5136b6454ba280917': [], '1406d42bfccd15e409906d9c9ea80b4ef453da0ce431b79e7f17e0297ff65aee': ['02a5d2405bd21ba746976426478f1eb1c0aae044ba106ee5136b6454ba280917'], '44a92fde76adbeb32f51a8af7d76179ba2b73ae6128fe39ccdf5af70714a9506': ['1406d42bfccd15e409906d9c9ea80b4ef453da0ce431b79e7f17e0297ff65aee'], 'a775f0c05d10bcf854c0294c9a631c18623abbb843252ffafff7a28ec2419c68': ['44a92fde76adbeb32f51a8af7d76179ba2b73ae6128fe39ccdf5af70714a9506'], 'f6b14e9b9b990eea55156d7da4acdbba458c889e59dc3f28708155ecf692646a': ['a775f0c05d10bcf854c0294c9a631c18623abbb843252ffafff7a28ec2419c68'], 'aa3db33339eaae00f2b9b61007b899bb896d2f50765028d03e93859db173bd16': ['f6b14e9b9b990eea55156d7da4acdbba458c889e59dc3f28708155ecf692646a'], 'fc731cd516c25b8e867bd9a5367564c727cbc2aac3c61bfe5d309570dc4e7d47': ['aa3db33339eaae00f2b9b61007b899bb896d2f50765028d03e93859db173bd16'], '9c5454f129d41ca07382a18722f3c3c7419501fd33075d0bb470beeca318781a': ['fc731cd516c25b8e867bd9a5367564c727cbc2aac3c61bfe5d309570dc4e7d47'], '37521d040df6d2178315ce354a3927616e8a033cb522fdbe3f5ad0b4b4e18c0d': ['9c5454f129d41ca07382a18722f3c3c7419501fd33075d0bb470beeca318781a'], 'de31bbfb60b4f178551cde43bf241913de4983c4c754a793abb38803684f274c': ['37521d040df6d2178315ce354a3927616e8a033cb522fdbe3f5ad0b4b4e18c0d'], '9691ef1fea20f6d198e192e1217ec02f01102871cf3b8fa7fad34e1ffa79740b': ['de31bbfb60b4f178551cde43bf241913de4983c4c754a793abb38803684f274c'], 'f56ea8d7cce1270945ec6f4d3d087808d894a8e484dae0d9f64e048a7f65ec61': ['9691ef1fea20f6d198e192e1217ec02f01102871cf3b8fa7fad34e1ffa79740b'], '3b4a04c979626f61b9b8f89587cbba095306e710b7bf3475e2833dfa6d0f178c': ['f56ea8d7cce1270945ec6f4d3d087808d894a8e484dae0d9f64e048a7f65ec61'], '9a70f8121a344ab9239c345dd2c444a065a1490065fe88b325f37aba9ffd08ee': ['3b4a04c979626f61b9b8f89587cbba095306e710b7bf3475e2833dfa6d0f178c'], '782f05edc7fdfefa1351075e62a1ccbd915b54e7be4419e2273ee202e3b21883': ['9a70f8121a344ab9239c345dd2c444a065a1490065fe88b325f37aba9ffd08ee'], 'a6958900a81932cccb8005c20e0e9fd552b8097c834b01fa9c5a23cd2fd5de19': ['782f05edc7fdfefa1351075e62a1ccbd915b54e7be4419e2273ee202e3b21883'], 'd58b36eb86c2588edceb7d4813d11117e760411afbc35b1bae8119da08267c9c': ['a6958900a81932cccb8005c20e0e9fd552b8097c834b01fa9c5a23cd2fd5de19']}
 
 Blocks Details:  
 
 Block Hash                                                                 Timestamp           Depth          Is Genesis     
-571b7739e183f019704a39025c313463feffff7db3ba2e3a8de6f441ddb64f70           0                   0              True           
-426367a4803e72b26602a7234426b2df355cb43d0c7f356355cc47231c57d297           1                   1              False          
-e979deb115b73f3d078e1dd2972660e7084ba251faed5185096b07354f6d374c           20246               2              False          
-c588c930842b31c818cd54f85509e850bf1bf315e59b437154f11777762fb4cd           42705               3              False          
-ffe22f2bf430b883b02bc82e1bdc3566b6fd39346edd1908884ebf55c52be085           57675               4              False          
+02a5d2405bd21ba746976426478f1eb1c0aae044ba106ee5136b6454ba280917           0                   0              True           
+1406d42bfccd15e409906d9c9ea80b4ef453da0ce431b79e7f17e0297ff65aee           1                   1              False          
+44a92fde76adbeb32f51a8af7d76179ba2b73ae6128fe39ccdf5af70714a9506           6075                2              False          
+a775f0c05d10bcf854c0294c9a631c18623abbb843252ffafff7a28ec2419c68           14461               3              False          
+f6b14e9b9b990eea55156d7da4acdbba458c889e59dc3f28708155ecf692646a           14728               4              False          
+aa3db33339eaae00f2b9b61007b899bb896d2f50765028d03e93859db173bd16           40392               5              False          
+fc731cd516c25b8e867bd9a5367564c727cbc2aac3c61bfe5d309570dc4e7d47           48690               6              False          
+9c5454f129d41ca07382a18722f3c3c7419501fd33075d0bb470beeca318781a           56727               7              False          
+37521d040df6d2178315ce354a3927616e8a033cb522fdbe3f5ad0b4b4e18c0d           66064               8              False          
+de31bbfb60b4f178551cde43bf241913de4983c4c754a793abb38803684f274c           80616               9              False          
+9691ef1fea20f6d198e192e1217ec02f01102871cf3b8fa7fad34e1ffa79740b           83632               10             False          
+f56ea8d7cce1270945ec6f4d3d087808d894a8e484dae0d9f64e048a7f65ec61           104839              11             False          
+3b4a04c979626f61b9b8f89587cbba095306e710b7bf3475e2833dfa6d0f178c           114837              12             False          
+9a70f8121a344ab9239c345dd2c444a065a1490065fe88b325f37aba9ffd08ee           127818              13             False          
+782f05edc7fdfefa1351075e62a1ccbd915b54e7be4419e2273ee202e3b21883           139353              14             False          
+a6958900a81932cccb8005c20e0e9fd552b8097c834b01fa9c5a23cd2fd5de19           154990              15             False          
+d58b36eb86c2588edceb7d4813d11117e760411afbc35b1bae8119da08267c9c           164007              16             False          
 
 
-Total Number of Blocks in BlockChain: 5
+Total Number of Blocks in BlockChain: 17
 
-Total Number of Blocks generated by this node in BlockChain: 0
+Total Number of Blocks generated by this node in BlockChain: 3
 
-Length of Longest chain: 5
+Length of Longest chain: 17
 
-Number of Blocks created by this node in the Longest chain: 0
+Number of Blocks created by this node in the Longest chain: 3
 
-Ratio (Number of blocks generated by this node in the Longest Chain of the tree/Total Blocks created by this node): 0/0
+Ratio (Number of blocks generated by this node in the Longest Chain of the tree/Total Blocks created by this node): 1.0
 
 #############################################################################################################################################################
 
 
 Transactions Details:
 
-Node of transactions heard: 66
+Node of transactions heard: 3564
 #############################################################################################################################################################
 
 
