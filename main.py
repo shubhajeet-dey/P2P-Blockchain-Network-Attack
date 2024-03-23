@@ -55,16 +55,25 @@ if __name__ == "__main__":
 
 	# Loop maxEventLoop times
 	cnt = 0
+	cancelledEventsSet = set()
+
 	while(cnt < maxEventLoop and 0 < len(eventQueue)):
 		# Getting nearest event (lowest timestamp)
 		currEvent = heapq.heappop(eventQueue)
 
+		if currEvent.eventID in cancelledEventsSet:
+			cancelledEventsSet.remove(currEvent.eventID)
+			continue
+
 		# Executing the event and getting future events to be added
-		futureEvents = currEvent.execute(nodeArray)
+		futureEvents, cancelledEvents = currEvent.execute(nodeArray)
 		
 		for event in futureEvents:
 			# Adding future events to the Event Queue
-			heapq.heappush(eventQueue, event)	
+			heapq.heappush(eventQueue, event)
+
+		# Updating cancelled events
+		cancelledEventsSet.update(cancelledEvents)
 
 		# Incrementing count
 		cnt = cnt + 1

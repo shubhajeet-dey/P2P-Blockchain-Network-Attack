@@ -20,6 +20,8 @@ class Node:
 	leafBlocks: Dictionary of blocks which are leaf nodes in the Node's Blockchain Tree, Structure = { BlockID (BlockHash): Block Object, ...}
 	peers: Contains information about the peers of the nodes, Structure = { Peer's NodeID : [ Peer's Node Object, propagation delay (rho_ij), link speed (c_ij) ], ... }
 	heardTXNs: Dictionary of all the Transactions which are heard by this node, Structure = { TXNID : TXN Object, ... }
+	depthOfMiningBlock: Depth of block that is currently getting mined (b/w creating and broadcast event)
+	futureBroadCastEvent: Broadcast Event ID is stored here, if the node is mining; This is necessary to cancel event if a block a received with greater depth (i.e shift to longest chain). 
 
 	'''
 	def __init__(self, nodeID, isSlow, isLowCPU, hashPower, PoWI, T_Tx):
@@ -36,6 +38,8 @@ class Node:
 		self.leafBlocks = dict()
 		self.peers = dict()
 		self.heardTXNs = dict()
+		self.depthOfMiningBlock = -1
+		self.futureBroadCastEvent = None
 
 	# Calculating latency for transmitting a message to a connected peer
 	def calculate_latency(self, numberOfKBs, peerNodeID):
@@ -145,6 +149,7 @@ class Node:
 
 		# Mining starts
 		self.status = "mining"
+		self.depthOfMiningBlock = block.depth
 
 		return block
 
