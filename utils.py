@@ -27,11 +27,11 @@ def assign_edge(nodeArray, i, j):
 	propagation_delay = uniform(10, 500)
 
 	# Setting link speed for this edge in bits/millisecond = 1000 bits/second
-	# If both are fast, link speed = 100 Mbps = 10^8 bps = 10^5 bits/millisecond
+	# If one of them is slow, link speed = 5 Mbps = 5*10^6 bps = 5000 bits/millisecond
 	if nodeArray[i].isSlow or nodeArray[j].isSlow:
 		link_speed = 5000
 	else:
-	# If one of them is slow, link speed = 5 Mbps = 5*10^6 bps = 5000 bits/millisecond
+	# If both are fast, link speed = 100 Mbps = 10^8 bps = 10^5 bits/millisecond
 		link_speed = 100000
 
 	# Adding each other as peers

@@ -150,8 +150,7 @@ class Node:
 
 	# Broadcast Block
 	def broadcast_block(self, block, timestamp):
-		# Finding the Longest chain the Block Tree, Maximum depth leaf node, to verify if it is still the longest
-		longestChainLeaf = None
+		# Finding the Longest chain depth the Block Tree, to verify if it is still the longest
 		maxDepth = -1
 
 		parentBlockHash = block.prevBlockHash
@@ -159,10 +158,9 @@ class Node:
 		for leafBlock in self.leafBlocks.keys():
 			if self.leafBlocks[leafBlock].depth > maxDepth:
 				maxDepth = self.leafBlocks[leafBlock].depth
-				longestChainLeaf = self.leafBlocks[leafBlock]
 
 		# Checking the block still extends the longest
-		if(not (longestChainLeaf.blockHash == parentBlockHash) ):
+		if(maxDepth > block.previousBlock.depth):
 			# Free from Mining
 			self.status = "free"
 			return False
