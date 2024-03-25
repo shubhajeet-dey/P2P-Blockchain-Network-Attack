@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import copy
+
 from block import Block
 from transactions import TXN
 import numpy as np
@@ -106,18 +106,20 @@ class Node:
 	# Create Block
 	def create_block(self, timestamp, nodeArray):
 		
-		# Finding the Longest chain the Block Tree, Maximum depth leaf node
+		# Finding the Longest chain the Block Tree, Maximum depth leaf node, Arrival Time (To get first seen block)
 		longestChainLeaf = None
 		maxDepth = -1
+		arrivalTime = None
 
 		# To allow randomness in choosing 2 equal depth blocks (resolution of forks)
 		leafBlocksKeys = list(self.leafBlocks.keys()) 
 		random.shuffle(leafBlocksKeys)
 
 		for leafBlock in leafBlocksKeys:
-			if self.leafBlocks[leafBlock].depth > maxDepth:
+			if self.leafBlocks[leafBlock].depth > maxDepth or (self.leafBlocks[leafBlock].depth == maxDepth and self.blocksSeen[leafBlock]["arrival_time"] < arrivalTime):
 				maxDepth = self.leafBlocks[leafBlock].depth
 				longestChainLeaf = self.leafBlocks[leafBlock]
+				arrivalTime = self.blocksSeen[leafBlock]["arrival_time"]
 
 		# Getting transaction details about the longest chain
 		nodeBalance, transactionsInChain = self.get_details_chain(longestChainLeaf, nodeArray)

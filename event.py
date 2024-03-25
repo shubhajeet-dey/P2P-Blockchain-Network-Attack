@@ -19,7 +19,12 @@ class Event:
         "create block at node i" --> ("create", "block")
         "broadcast block at node i" -->  ("broadcast", "block")
         "receive block at node i" --> ("receive", "block")
-
+    Now, as attackers are present, the events will change as these:
+        "create transaction at attacker node i" --> ("create", "TXN")
+        "receive transaction at attacker node i" --> ("receive", "TXN")
+        "create block at attacker node i" --> ("create", "block")
+        "Mining finished for a block at attacker node i" -->  ("finished", "block")
+        "receive block at attacker node i" --> ("receive", "block")
     '''
     def __init__(self, timestamp, createdBy, executedBy, eventObject, eventType):
         self.eventID = secrets.token_hex(32)
@@ -36,26 +41,49 @@ class Event:
     # Execute the Event based on eventType
     def execute(self, nodeArray):
 
-        # Printing to terminal
-        print("EVENT: Timestamp: " + str(self.timestamp) + " milliseconds, Type: " + self.eventType[0] + (" block creation : " if self.eventType[0] == "genesis" else " " + self.eventType[1] + " at node " + str(self.executedBy) + " : "), end='')
-        
-        if self.eventType[0] == "genesis":
-            return self.create_genesis_block(nodeArray)
+        # Checking if event is related to a attack node
+        if (self.executedBy is not None) and (type(nodeArray[self.executedBy]).__name__ == "AttackNode"):
+            
+            # Printing to terminal
+            print("EVENT: Timestamp: " + str(self.timestamp) + " milliseconds, Type: " + self.eventType[0] + " " + self.eventType[1] + " at attack node " + str(self.executedBy) + " : ", end='')
 
-        elif self.eventType[0] == "create":
-            if self.eventType[1] == "TXN":
-                return self.create_transaction(nodeArray)
+            if self.eventType[0] == "create":
+                if self.eventType[1] == "TXN":
+                    return self.create_transaction_attack_node(nodeArray)
+                else:
+                    return self.create_block_attack_node(nodeArray)
+
+            elif self.eventType[0] == "finished" and self.eventType[1] == "block":
+                return self.finished_block_attack_node(nodeArray)
+
             else:
-                return self.create_block(nodeArray)
+                if self.eventType[1] == "TXN":
+                    return self.receive_transaction_attack_node(nodeArray)
+                else:
+                    return self.receive_block_attack_node(nodeArray)
 
-        elif self.eventType[0] == "broadcast" and self.eventType[1] == "block":
-            return self.broadcast_block(nodeArray)
 
         else:
-            if self.eventType[1] == "TXN":
-                return self.receive_transaction(nodeArray)
+            # Printing to terminal
+            print("EVENT: Timestamp: " + str(self.timestamp) + " milliseconds, Type: " + self.eventType[0] + (" block creation : " if self.eventType[0] == "genesis" else " " + self.eventType[1] + " at node " + str(self.executedBy) + " : "), end='')
+            
+            if self.eventType[0] == "genesis":
+                return self.create_genesis_block(nodeArray)
+
+            elif self.eventType[0] == "create":
+                if self.eventType[1] == "TXN":
+                    return self.create_transaction(nodeArray)
+                else:
+                    return self.create_block(nodeArray)
+
+            elif self.eventType[0] == "broadcast" and self.eventType[1] == "block":
+                return self.broadcast_block(nodeArray)
+
             else:
-                return self.receive_block(nodeArray)
+                if self.eventType[1] == "TXN":
+                    return self.receive_transaction(nodeArray)
+                else:
+                    return self.receive_block(nodeArray)
 
     # Create genesis block
     def create_genesis_block(self, nodeArray):
@@ -95,6 +123,29 @@ class Event:
 
         return futureEvents, cancelledEvents
 
+    # Create transaction at attack node i
+    def create_transaction_attack_node(self, nodeArray):
+        txn = nodeArray[self.executedBy].create_transaction(nodeArray, self.timestamp)
+        
+        futureEvents = []
+        cancelledEvents = []
+
+        # Transmit created transaction to peer nodes
+        for peer in nodeArray[self.executedBy].peers.keys():
+            # Calculating timestamp of the future event, size of txn is 1KB
+            future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(1, peer))
+
+            # Adding event to receive the transaction at the peers
+            futureEvents.append(Event(future_timestamp, self.executedBy, peer, txn, ("receive", "TXN")))
+
+        # Add event to create transaction after an exponential time gap (exponential interarrival time)
+        future_timestamp = self.timestamp + round(nodeArray[self.executedBy].next_create_transaction_delay())
+        futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, None, ("create", "TXN")))
+
+        print("Successful!")
+
+        return futureEvents, cancelledEvents
+
     # Create transaction at node i
     def create_transaction(self, nodeArray):
         txn = nodeArray[self.executedBy].create_transaction(nodeArray, self.timestamp)
@@ -113,6 +164,39 @@ class Event:
         # Add event to create transaction after an exponential time gap (exponential interarrival time)
         future_timestamp = self.timestamp + round(nodeArray[self.executedBy].next_create_transaction_delay())
         futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, None, ("create", "TXN")))
+
+        print("Successful!")
+
+        return futureEvents, cancelledEvents
+
+    # Receive transaction at attack node i
+    def receive_transaction_attack_node(self, nodeArray):
+        # Retrieving the Transaction
+        txn = self.eventObject
+
+        # Loop-Less transaction forwarding
+        # Checking if the transaction is already heard at this node
+        # If heard then transaction is already processed (sent to peers) in the past
+        if txn.TXNID in nodeArray[self.executedBy].heardTXNs:
+            print("Already Heard!")
+            return [], []
+
+        nodeArray[self.executedBy].receive_transaction(txn)
+
+        futureEvents = []
+        cancelledEvents = []
+
+        # Transmit received transaction to peer nodes
+        for peer in nodeArray[self.executedBy].peers.keys():
+            # The receive event is created by the transmitting node, so ignoring it for Loop-Less transaction forwarding
+            if peer == self.createdBy:
+                continue
+
+            # Calculating timestamp of the future event, size of txn is 1KB
+            future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(1, peer))
+
+            # Adding event to receive the transaction at the peers
+            futureEvents.append(Event(future_timestamp, self.executedBy, peer, txn, ("receive", "TXN")))
 
         print("Successful!")
 
@@ -151,6 +235,43 @@ class Event:
 
         return futureEvents, cancelledEvents
 
+    # Create block at attack node i
+    def create_block_attack_node(self, nodeArray):
+        
+        # Node is busy mining other block (not free)
+        if not (nodeArray[self.executedBy].status == "free"):
+            print("Node busy!")
+            return [], []
+
+        futureEvents = []
+        cancelledEvents = []
+
+        # Node a state zero dash (racing condition b/w honest's and attacker's chains)
+        if nodeArray[self.executedBy].atStateZero_ :
+            block = nodeArray[self.executedBy].create_block_at_state_zero_dash(self.timestamp, nodeArray)
+
+            # Calculating timestamp of the future event (Broadcasting the created block after POW)
+            future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_POW_time())
+
+            # Adding finished event in the future
+            futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, block, ("finished", "block")))
+            nodeArray[self.executedBy].futureEvents = [futureEvents[-1].eventID]
+
+        else:
+            # For other states the block is generated on longest chain (both including private and public) 
+            block = nodeArray[self.executedBy].create_block(self.timestamp, nodeArray)
+
+            # Calculating timestamp of the future event (Broadcasting the created block after POW)
+            future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_POW_time())
+
+            # Adding finished event in the future
+            futureEvents.append(Event(future_timestamp, self.executedBy, self.executedBy, block, ("finished", "block")))
+            nodeArray[self.executedBy].futureEvents = [futureEvents[-1].eventID]
+
+        print("Successful!")
+
+        return futureEvents, cancelledEvents
+
     # Create block at node i
     def create_block(self, nodeArray):
         
@@ -174,6 +295,53 @@ class Event:
         print("Successful!")
 
         return futureEvents, cancelledEvents
+
+    # Mining on block finishes at attack node i
+    def finished_block_attack_node(self, nodeArray):
+        # Retrieving the Block
+        block = self.eventObject
+
+        futureEvents = []
+        cancelledEvents = []
+
+        # Node a state zero dash (racing condition b/w honest's and attacker's chains)
+        if nodeArray[self.executedBy].atStateZero_ :
+
+            # If the longest chain, broadcast the block (attacker wins and makes his/her block public)
+            if nodeArray[self.executedBy].broadcast_block_at_state_zero_dash(block, self.timestamp):
+
+                # Size of the block in KBs
+                blockSize = len(block.transactions)
+
+                # Broadcast the new block to the peer nodes
+                for peer in nodeArray[self.executedBy].peers.keys():
+
+                    # Calculating timestamp of the future event depending size of block
+                    future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
+
+                    # Adding event to receive the block at the peers
+                    futureEvents.append(Event(future_timestamp, self.executedBy, peer, block, ("receive", "block")))
+
+                print("Successful!")
+            else:
+                print("Failed! (Not Longest Chain)")
+
+            # Adding an block creation event at same timestamp (broadcast event over)
+            futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))
+
+            return futureEvents, cancelledEvents
+
+        else:
+            # If the same longest chain, add block into the private chain
+            if nodeArray[self.executedBy].finished_block(block, self.timestamp):
+                print("Successful!")
+            else:
+                print("Failed! (Not Longest Chain)")
+
+            # Adding an block creation event at same timestamp (mining event over)
+            futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))
+
+            return futureEvents, cancelledEvents
 
     # Broadcast block at node i
     def broadcast_block(self, nodeArray):
@@ -203,6 +371,179 @@ class Event:
             print("Failed! (Not Longest Chain)")
 
         # Adding an block creation event at same timestamp (broadcast event over)
+        futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))
+
+        return futureEvents, cancelledEvents
+
+    # Receive block at attack node i
+    def receive_block_attack_node(self, nodeArray):
+        # Retrieving the Block
+        block = self.eventObject
+
+        # Loop-Less Block forwarding
+        # Checking if the block is already heard at this node
+        # If heard then block is already processed in the past
+        if block.blockHash in nodeArray[self.executedBy].blocksTree:
+            print("Already Heard!")
+            return [], []
+
+        futureEvents = []
+        cancelledEvents = []
+
+        # If valid block then change the state
+        if nodeArray[self.executedBy].validate_block(self.timestamp, block, nodeArray):
+
+            # If node is not doing any selfish mining or if the LVC exceeds the length of the selfish miner’s private chain then start a new attack on the last block of the longest chain visible.
+            if (nodeArray[self.executedBy].lastBlock is None) or (nodeArray[self.executedBy].lastBlock.depth < block.depth):
+                
+                nodeArray[self.executedBy].privateChainExists = False
+                nodeArray[self.executedBy].lastBlock = None
+                cancelledEvents.extend(nodeArray[self.executedBy].futureEvents)
+                nodeArray[self.executedBy].futureEvents = []
+                nodeArray[self.executedBy].atStateZero_ = False
+                nodeArray[self.executedBy].status = "free"
+
+                # Making private blocks public for better visualization
+                for privateBlock in nodeArray[self.executedBy].privateChain:
+
+                    # Adding block to public block Tree
+                    nodeArray[self.executedBy].blocksTree[privateBlock[1].blockHash] = { "arrival_time": privateBlock[0], "Block": privateBlock[1] }
+
+                    if privateBlock[1].previousBlock.blockHash in nodeArray[self.executedBy].leafBlocks:
+                        nodeArray[self.executedBy].leafBlocks.pop(privateBlock[1].previousBlock.blockHash)
+                        nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+                    else:
+                        nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+
+                    # Size of the block in KBs
+                    blockSize = len(privateBlock[1].transactions)
+
+                    # Transmitting the block to the peer nodes
+                    for peer in nodeArray[self.executedBy].peers.keys():
+
+                        # Calculating timestamp of the future event depending size of block
+                        future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
+
+                        # Adding event to receive the block at the peers
+                        futureEvents.append(Event(future_timestamp, self.executedBy, peer, privateBlock[1], ("receive", "block")))
+
+                nodeArray[self.executedBy].privateChain = []
+
+            # Block of same depth or lower as starting block (block from which attack start) --> No change
+            elif (not nodeArray[self.executedBy].privateChainExists):
+                
+                pass
+
+            else:
+                # Private chain exists
+
+                # Starting Block Depth
+                startingDepth = nodeArray[self.executedBy].privateChain[0][1].previousBlock.depth
+
+                # New block is appended in part lower than or equal to starting block (block from which attack start) --> No change
+                if block.depth <= startingDepth:
+                    pass
+
+                # If the lead of the selfish miner was 1 block over the LVC, and the lead now becomes zero (1 --> 0')
+                elif (nodeArray[self.executedBy].lastBlock.depth == block.depth):
+                
+                    nodeArray[self.executedBy].privateChainExists = False
+                    nodeArray[self.executedBy].atStateZero_ = True
+
+                    # Making private block public (1 --> 0')
+                    privateBlock = nodeArray[self.executedBy].privateChain[0]
+
+                    # Adding block to public block Tree
+                    nodeArray[self.executedBy].blocksTree[privateBlock[1].blockHash] = { "arrival_time": privateBlock[0], "Block": privateBlock[1] }
+
+                    if privateBlock[1].previousBlock.blockHash in nodeArray[self.executedBy].leafBlocks:
+                        nodeArray[self.executedBy].leafBlocks.pop(privateBlock[1].previousBlock.blockHash)
+                        nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+                    else:
+                        nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+
+                    # Size of the block in KBs
+                    blockSize = len(privateBlock[1].transactions)
+
+                    # Transmitting the block to the peer nodes
+                    for peer in nodeArray[self.executedBy].peers.keys():
+
+                        # Calculating timestamp of the future event depending size of block
+                        future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
+
+                        # Adding event to receive the block at the peers
+                        futureEvents.append(Event(future_timestamp, self.executedBy, peer, privateBlock[1], ("receive", "block")))
+
+                    nodeArray[self.executedBy].privateChain = []
+
+                # If the lead of the selfish miner over the LVC is 2 blocks and then one block gets added to the LVC (New lead = 1) (2 --> 0)
+                elif (nodeArray[self.executedBy].lastBlock.depth - 1 == block.depth):
+
+                    nodeArray[self.executedBy].privateChainExists = False
+                    nodeArray[self.executedBy].lastBlock = None
+                    nodeArray[self.executedBy].atStateZero_ = False
+
+                    # Making private blocks public and broadcasting immediately
+                    for privateBlock in nodeArray[self.executedBy].privateChain:
+
+                        # Adding block to public block Tree
+                        nodeArray[self.executedBy].blocksTree[privateBlock[1].blockHash] = { "arrival_time": privateBlock[0], "Block": privateBlock[1] }
+
+                        if privateBlock[1].previousBlock.blockHash in nodeArray[self.executedBy].leafBlocks:
+                            nodeArray[self.executedBy].leafBlocks.pop(privateBlock[1].previousBlock.blockHash)
+                            nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+                        else:
+                            nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+
+                        # Size of the block in KBs
+                        blockSize = len(privateBlock[1].transactions)
+
+                        # Transmitting the block to the peer nodes
+                        for peer in nodeArray[self.executedBy].peers.keys():
+
+                            # Calculating timestamp of the future event depending size of block
+                            future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
+
+                            # Adding event to receive the block at the peers
+                            futureEvents.append(Event(future_timestamp, self.executedBy, peer, privateBlock[1], ("receive", "block")))
+
+                    nodeArray[self.executedBy].privateChain = []
+
+                # If the lead of the selfish miner over the LVC is greater than 2, as soon as the LVC increases in length by 1 block, then the selfish miner makes public one more block (i --> i-1, i >= 3)
+                elif (nodeArray[self.executedBy].lastBlock.depth - block.depth >= 2):
+
+                    nodeArray[self.executedBy].atStateZero_ = False
+
+                    # Making a block (first block in private chain) public and broadcasting it
+                    privateBlock = nodeArray[self.executedBy].privateChain[0]
+                    nodeArray[self.executedBy].privateChain.pop(0)
+
+                    # Adding block to public block Tree
+                    nodeArray[self.executedBy].blocksTree[privateBlock[1].blockHash] = { "arrival_time": privateBlock[0], "Block": privateBlock[1] }
+
+                    if privateBlock[1].previousBlock.blockHash in nodeArray[self.executedBy].leafBlocks:
+                        nodeArray[self.executedBy].leafBlocks.pop(privateBlock[1].previousBlock.blockHash)
+                        nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+                    else:
+                        nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+
+                    # Size of the block in KBs
+                    blockSize = len(privateBlock[1].transactions)
+
+                    # Transmitting the block to the peer nodes
+                    for peer in nodeArray[self.executedBy].peers.keys():
+
+                        # Calculating timestamp of the future event depending size of block
+                        future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
+
+                        # Adding event to receive the block at the peers
+                        futureEvents.append(Event(future_timestamp, self.executedBy, peer, privateBlock[1], ("receive", "block")))
+
+            print("Successful!")
+        else:
+            print("Failed! Invalid Block")
+
+        # Adding an block creation event at same timestamp (validation event over)
         futureEvents.append(Event(self.timestamp, self.executedBy, self.executedBy, None, ("create", "block")))
 
         return futureEvents, cancelledEvents
