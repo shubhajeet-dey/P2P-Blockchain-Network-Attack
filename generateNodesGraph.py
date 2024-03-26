@@ -13,13 +13,17 @@ def generate_connectivity_graph(nodeArray):
             G.add_edge(node.nodeID, peer)
     return G
 
-def generate_node_connectivity_graph(nodeArray):
+def generate_node_connectivity_graph(nodeArray, colors):
     # Generate the connectivity graph
     connectivity_graph = generate_connectivity_graph(nodeArray)
 
+    node_colors = ["skyblue"]*(len(nodeArray))
+    node_colors[-2] = colors[0]
+    node_colors[-1] = colors[1]
+
     # Drawing the graph
     node_labels = nx.get_node_attributes(connectivity_graph, 'label')
-    nx.draw(connectivity_graph, with_labels=True,labels=node_labels, node_size=1000, node_color="skyblue", font_size=12, font_weight="bold")
+    nx.draw(connectivity_graph, nodelist=sorted(list(connectivity_graph)), with_labels=True,labels=node_labels, node_size=1000, node_color=node_colors, font_size=12, font_weight="bold")
     plt.title("Node Connectivity Graph")
 
     # Saving the graph as an image file
@@ -30,7 +34,7 @@ def generate_node_connectivity_graph(nodeArray):
     # plt.show()
 
 
-def generate_blockchain_graph_of_one_node(node):
+def generate_blockchain_graph_of_one_node(node, colors, N):
     '''
         This function creates Graph of the blocktree maintained in a node/peer
     '''
@@ -56,7 +60,11 @@ def generate_blockchain_graph_of_one_node(node):
         # Add nodes and edges from the adjacency list
         for block_hash, parent_hashes in adjacency_list.items():
             valueToDisplayInGraph = str(block_hash[:4]) + "..."+ str(block_hash[-4:])
-            G.node(block_hash, label=f"{valueToDisplayInGraph}")
+            minedBy = node.blocksSeen[block_hash]["Block"].transactions[0].toNode
+            if minedBy >= N:
+                G.node(block_hash, label=f"{valueToDisplayInGraph}", color=colors[minedBy - N])
+            else:    
+                G.node(block_hash, label=f"{valueToDisplayInGraph}")
             for parent_hash in parent_hashes:
                 G.edge(block_hash, parent_hash)
 
@@ -85,8 +93,77 @@ def generate_blockchain_graph_of_one_node(node):
      # Render and save the blockchain digraph as a PDF document
     blockchain_digraph.render(pdfilename, format='pdf', cleanup=True)
 
+def generate_blockchain_graph_of_one_attack_node(node, colors, N):
+    '''
+        This function creates Graph of the blocktree maintained in a attack node/peer
+    '''
 
-def generate_blockchain_graph_visualization(nodeArray):
+    def create_blockchain_digraph(adjacency_list):
+        """
+                Create a directed graph (Digraph) representing a blockchain from an adjacency list.
+
+                Parameters:
+                - adjacency_list: A dictionary where keys are block hashes and values are lists of parent block hashes.
+
+                Returns:
+                - G: A Digraph object representing the blockchain graph.
+
+                Comments:
+                - This function creates a directed graph (Digraph) using the Graphviz library.
+                - The graph represents a blockchain where blocks are nodes and edges indicate parent-child relationships between blocks.
+                - Each block hash is truncated to display only the first 4 and last 4 characters in the graph.
+                - The adjacency list contains information about which blocks are parents of each block.
+        """
+        G = Digraph(engine="dot",node_attr={'shape':'box'})
+
+        # Add nodes and edges from the adjacency list
+        for block_hash, parent_hashes in adjacency_list.items():
+            valueToDisplayInGraph = str(block_hash[:4]) + "..."+ str(block_hash[-4:])
+
+            minedBy = node.blocksTree[block_hash]["Block"].transactions[0].toNode
+            if minedBy >= N:
+                G.node(block_hash, label=f"{valueToDisplayInGraph}", color=colors[minedBy - N])
+            else:    
+                G.node(block_hash, label=f"{valueToDisplayInGraph}")
+            
+            for parent_hash in parent_hashes:
+                G.edge(block_hash, parent_hash)
+
+        # Add private chain too
+        for privateBlock in node.privateChain:
+            block_hash = privateBlock[1].blockHash
+            parent_hash = privateBlock[1].prevBlockHash
+            valueToDisplayInGraph = str(block_hash[:4]) + "..."+ str(block_hash[-4:])
+            G.node(block_hash, label=f"{valueToDisplayInGraph}", color=colors[node.nodeID - N], style="dashed")
+            G.edge(block_hash,parent_hash,style="dashed")
+
+        return G
+
+    adjacency_list = {}
+
+    for blockID in node.blocksTree:
+        if(node.blocksTree[blockID]["Block"].isGenesis):
+            continue
+        adjacency_list[blockID] = [node.blocksTree[blockID]["Block"].prevBlockHash]
+
+    # Create the blockchain digraph
+    blockchain_digraph = create_blockchain_digraph(adjacency_list)
+
+    # Visualize the blockchain digraph
+    blockchain_digraph.attr(rankdir='RL')
+
+    # Define the filenames for saving the PNG and PDF files
+    pngfilename = "./Results/BlockChains/PNG/blockchain_graph_of_attack_node_"+str(node.nodeID)
+    pdfilename = "./Results/BlockChains/PDF/blockchain_graph_of_attack_node_"+str(node.nodeID)
+
+    # Render and save the blockchain digraph as a PNG image
+    blockchain_digraph.render(pngfilename, format='png', cleanup=True)
+
+     # Render and save the blockchain digraph as a PDF document
+    blockchain_digraph.render(pdfilename, format='pdf', cleanup=True)
+
+
+def generate_blockchain_graph_visualization(nodeArray, colors):
     """
         Generate visualization for blockchain graphs for each node in the nodeArray.
 
@@ -98,10 +175,12 @@ def generate_blockchain_graph_visualization(nodeArray):
     """
     #  here node array contains object of all nodes we will take nodes one by one an inside the node we have 
     #  one blockchain each and for each blockchain we will generate a visualization 
-    for node in nodeArray:    
+    for node in nodeArray[:-2]:    
         # Generate the blockchain visualization graph
-        generate_blockchain_graph_of_one_node(node)
-    return
+        generate_blockchain_graph_of_one_node(node, colors, len(nodeArray)-2)
+
+    generate_blockchain_graph_of_one_attack_node(nodeArray[-2], colors, len(nodeArray)-2)
+    generate_blockchain_graph_of_one_attack_node(nodeArray[-1], colors, len(nodeArray)-2)
 
 def generate_records_of_one_node_txt(node):
     filename = "./Results/Records/txt/InformationOfNode"+str(node.nodeID)+".txt"

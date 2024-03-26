@@ -28,21 +28,31 @@ if __name__ == "__main__":
 		sys.exit()
 
 	# I and T_Tx are given in milliseconds
+	# nodes represents number of honest nodes
 	nodes = int(inputs['nodes'])
 
-	if nodes <= 3:
+	if nodes <= 1:
 		print("Node graph cannot be form using the given conditions (6 >= noOfPeers >= 3)!!!!")
 		print("!!!!Exiting!!!!")
 		sys.exit()
 
-	z0 = float(inputs['z0'])
-	z1 = float(inputs['z1'])
+	zeta_1 = float(inputs['zeta_1'])
+	zeta_2 = float(inputs['zeta_2'])
+
+	if (zeta_1 + zeta_2) >= 1:
+		print("Sum of hash powers of Adversaries is greater than equal to 1 (Not possible)!!!!")
+		print("!!!!Exiting!!!!")
+		sys.exit()
+
 	T_Tx = int(inputs['T_Tx'])
 	I  = int(inputs['I'])
 	maxEventLoop = int(inputs['maxEventLoop'])
 
+	# Colors to represent the advesary nodes
+	colors = { 0 : "red", 1 : "orange" }
+
 	# Initializing nodes and creating a P2P network
-	nodeArray = init_nodes(nodes, z0, z1, I, T_Tx)
+	nodeArray = init_nodes(nodes, zeta_1, zeta_2, I, T_Tx, colors)
 
 	print("============= Starting Simulation =============")
 
@@ -80,7 +90,7 @@ if __name__ == "__main__":
 
 	print("============= Ending Simulation =============\n\n")
 	cleanup()
-	print("Storing the information in multiple files (HTML, PDF, TXT)......")
+	print("Storing the information in multiple files (HTML, PDF, TXT, PNG)......")
 
-	generate_blockchain_graph_visualization(nodeArray)
+	generate_blockchain_graph_visualization(nodeArray, colors)
 	generate_records_of_all_nodes(nodeArray)
