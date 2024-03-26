@@ -4,6 +4,7 @@ from block import Block
 from transactions import TXN
 import numpy as np
 import random
+import sys
 
 # Class for Attack Node
 class AttackNode:
@@ -68,6 +69,8 @@ class AttackNode:
 
 	# Calculating POW time (T_k)
 	def calculate_POW_time(self):
+		if self.hashPower == 0:
+			return np.random.exponential(scale=(sys.maxsize))
 		return np.random.exponential(scale=(self.PoWI / self.hashPower))
 
 	# Create a random transaction with random amount

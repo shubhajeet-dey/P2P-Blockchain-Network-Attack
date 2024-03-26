@@ -10,7 +10,6 @@ class Node:
 	'''
 	NodeID: Unique Identifier for each Node
 	isSlow: Boolean value stating if the node is slow or fast
-	isLowCPU: Boolean value stating if the node has low or high CPU
 	hashPower: Node's fraction of the total hashing power.
 	PoWI: The interarrival time between blocks on average
 	T_Tx: The mean interarrival time between transactions
@@ -24,11 +23,10 @@ class Node:
 	futureBroadCastEvent: Broadcast Event ID is stored here, if the node is mining; This is necessary to cancel event if a block a received with greater depth (i.e shift to longest chain). 
 
 	'''
-	def __init__(self, nodeID, isSlow, isLowCPU, hashPower, PoWI, T_Tx):
+	def __init__(self, nodeID, isSlow, hashPower, PoWI, T_Tx):
 
 		self.nodeID = nodeID
 		self.isSlow = isSlow
-		self.isLowCPU = isLowCPU
 		self.hashPower = hashPower
 		self.PoWI = PoWI
 		self.T_Tx = T_Tx
@@ -64,6 +62,8 @@ class Node:
 
 	# Calculating POW time (T_k)
 	def calculate_POW_time(self):
+		if self.hashPower == 0:
+			return np.random.exponential(scale=(sys.maxsize))
 		return np.random.exponential(scale=(self.PoWI / self.hashPower))
 
 	# Create a random transaction with random amount

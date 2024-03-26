@@ -7,15 +7,15 @@ import random
 def parseArguments(inputs):
 
     if len(inputs) != 7:
-        print("Usage : python3 main.py node z0 z1 T_Tx I maxEventLoop\n")
+        print("Usage : python3 main.py nodes zeta_1 zeta_2 T_Tx I maxEventLoop\n")
         return None
     else:
         required_input = {
             'nodes'             : inputs[1],
-            'z0'                : inputs[2],
-            'z1'                : inputs[3],
             'T_Tx'              : inputs[4],
             'I'                 : inputs[5],
+            'zeta_1'            : inputs[2],
+            'zeta_2'            : inputs[3],
         	'maxEventLoop'      : inputs[6],
         }
         return required_input

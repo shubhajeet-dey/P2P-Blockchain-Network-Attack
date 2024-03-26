@@ -98,12 +98,24 @@ class Event:
         # Creating the genesis block
         genesisBlock = Block(0, None, True, genesisTransactions)
 
-        # Adding the genesis block in each node
-        for i in range(len(nodeArray)):
+        # Adding the genesis block in each honest node
+        for i in range(len(nodeArray)-2):
             nodeArray[i].blocksSeen[genesisBlock.blockHash] = { "arrival_time": 0, "Block": genesisBlock }
             nodeArray[i].leafBlocks[genesisBlock.blockHash] = genesisBlock
             for txn in genesisTransactions:
                 nodeArray[i].heardTXNs[txn.TXNID] = txn
+
+        # Adding the genesis block in Advesary 1 node
+        nodeArray[-2].blocksTree[genesisBlock.blockHash] = { "arrival_time": 0, "Block": genesisBlock }
+        nodeArray[-2].leafBlocks[genesisBlock.blockHash] = genesisBlock
+        for txn in genesisTransactions:
+            nodeArray[-2].heardTXNs[txn.TXNID] = txn
+
+        # Adding the genesis block in Advesary 2 node
+        nodeArray[-1].blocksTree[genesisBlock.blockHash] = { "arrival_time": 0, "Block": genesisBlock }
+        nodeArray[-1].leafBlocks[genesisBlock.blockHash] = genesisBlock
+        for txn in genesisTransactions:
+            nodeArray[-1].heardTXNs[txn.TXNID] = txn
 
         futureEvents = []
         cancelledEvents = []
@@ -514,30 +526,32 @@ class Event:
 
                     nodeArray[self.executedBy].atStateZero_ = False
 
-                    # Making a block (first block in private chain) public and broadcasting it
-                    privateBlock = nodeArray[self.executedBy].privateChain[0]
-                    nodeArray[self.executedBy].privateChain.pop(0)
+                    # Releasing a subchain that ends with that block which enters into competition with the new block at the end of the LVC.
+                    while(nodeArray[self.executedBy].privateChain[0][1].depth <= block.depth):
+                        # Making a block (first block in private chain) public and broadcasting it
+                        privateBlock = nodeArray[self.executedBy].privateChain[0]
+                        nodeArray[self.executedBy].privateChain.pop(0)
 
-                    # Adding block to public block Tree
-                    nodeArray[self.executedBy].blocksTree[privateBlock[1].blockHash] = { "arrival_time": privateBlock[0], "Block": privateBlock[1] }
+                        # Adding block to public block Tree
+                        nodeArray[self.executedBy].blocksTree[privateBlock[1].blockHash] = { "arrival_time": privateBlock[0], "Block": privateBlock[1] }
 
-                    if privateBlock[1].previousBlock.blockHash in nodeArray[self.executedBy].leafBlocks:
-                        nodeArray[self.executedBy].leafBlocks.pop(privateBlock[1].previousBlock.blockHash)
-                        nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
-                    else:
-                        nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+                        if privateBlock[1].previousBlock.blockHash in nodeArray[self.executedBy].leafBlocks:
+                            nodeArray[self.executedBy].leafBlocks.pop(privateBlock[1].previousBlock.blockHash)
+                            nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
+                        else:
+                            nodeArray[self.executedBy].leafBlocks[privateBlock[1].blockHash] = privateBlock[1]
 
-                    # Size of the block in KBs
-                    blockSize = len(privateBlock[1].transactions)
+                        # Size of the block in KBs
+                        blockSize = len(privateBlock[1].transactions)
 
-                    # Transmitting the block to the peer nodes
-                    for peer in nodeArray[self.executedBy].peers.keys():
+                        # Transmitting the block to the peer nodes
+                        for peer in nodeArray[self.executedBy].peers.keys():
 
-                        # Calculating timestamp of the future event depending size of block
-                        future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
+                            # Calculating timestamp of the future event depending size of block
+                            future_timestamp = self.timestamp + round(nodeArray[self.executedBy].calculate_latency(blockSize, peer))
 
-                        # Adding event to receive the block at the peers
-                        futureEvents.append(Event(future_timestamp, self.executedBy, peer, privateBlock[1], ("receive", "block")))
+                            # Adding event to receive the block at the peers
+                            futureEvents.append(Event(future_timestamp, self.executedBy, peer, privateBlock[1], ("receive", "block")))
 
             print("Successful!")
         else:
