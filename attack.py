@@ -21,7 +21,7 @@ class AttackNode:
 	peers: Contains information about the peers of the nodes, Structure = { Peer's NodeID : [ Peer's Node Object, propagation delay (rho_ij), link speed (c_ij) ], ... }
 	heardTXNs: Dictionary of all the Transactions which are heard by this node, Structure = { TXNID : TXN Object, ... }
 	privateChainExists: Boolean Value stating if private chain is active or not
-	privateChain: List of private blocks, Structure = [["creation_time" , Block Object ], []...]
+	privateChain: List of private blocks, Structure = [["timestamp" , Block Object ], []...]
 	lastBlock: Last block in the attacker's chain
 	futureEvents: Future events that may needed to be cancelled
 	atStateZero_: Boolean value stating whether the node is at State Zero Dash {0'}
