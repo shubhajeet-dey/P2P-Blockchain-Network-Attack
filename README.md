@@ -14,11 +14,11 @@ winget install graphviz
 ```
 # To run the simulator:
 ```bash
-python3 main.py node z0 z1 T_Tx I maxEventLoop
+python3 main.py nodes zeta_1 zeta_2 T_Tx I maxEventLoop
 
-# node: Number of Nodes
-# z0: Value of z0 (0 < z0 < 1)
-# z1: Value of z1 (0< z1 < 1)
+# nodes: Number of Nodes
+# zeta_1: Hash Power of Advesary 1 (0 < zeta_1 < 1)
+# zeta_2: Hash Power of Advesary 2 (0 < zeta_2 < 1)
 # T_Tx: Value of T_Tx in milliseconds
 # I: Value of I in milliseconds
 # maxEventLoop: Number of times the event loop should run
