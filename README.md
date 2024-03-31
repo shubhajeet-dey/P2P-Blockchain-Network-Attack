@@ -16,7 +16,7 @@ winget install graphviz
 ```bash
 python3 main.py nodes zeta_1 zeta_2 T_Tx I maxEventLoop
 
-# nodes: Number of Nodes
+# nodes: Number of Honest Nodes
 # zeta_1: Hash Power of Advesary 1 (0 < zeta_1 < 1)
 # zeta_2: Hash Power of Advesary 2 (0 < zeta_2 < 1)
 # T_Tx: Value of T_Tx in milliseconds

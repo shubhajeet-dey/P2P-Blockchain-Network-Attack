@@ -5,65 +5,73 @@ This is information about attack node of ID=10
 Attack Node Categeory:
 	Bandwidth: Fast Node
 
-Hashing Power Fraction: 0.4
+Hashing Power Fraction: 0.3
 
-PoWI: The interarrival time between blocks on average is 500 miliseconds
+PoWI: The interarrival time between blocks on average is 100 miliseconds
 
-T_Tx: The mean interarrival time between transactions is 500 miliseconds
+T_Tx: The mean interarrival time between transactions is 10 miliseconds
 
 #############################################################################################################################################################
 
 Peers Information: 
 
-No of Peers Nodes: 6
-Peers are:[3, 5, 11, 9, 0, 7]
+No of Peers Nodes: 4
+Peers are:[9, 6, 2, 7]
 
 #############################################################################################################################################################
 
 
 Information of Blocks on this node: 
 
-No. of Public Blocks on this node: 4
-Public Blocks Adjacency List: {'a03dce6c77677e56b6701c1b8290e1c723da8a00269b46836f940156e1c95088': [], '993d5619e0f8072cb2a290b34ccce63fee300656fba8fa791b0ba5da5f23b11c': ['a03dce6c77677e56b6701c1b8290e1c723da8a00269b46836f940156e1c95088'], 'ba1e128f2c0016214cc6bd7aed4f78f736e6b7b23b04781f70522285f8166f15': ['a03dce6c77677e56b6701c1b8290e1c723da8a00269b46836f940156e1c95088'], '930f025da04a4321ff61d21319b1df7d917c435789d6f0a7d80c144d5900a91d': ['a03dce6c77677e56b6701c1b8290e1c723da8a00269b46836f940156e1c95088']}
+No. of Public Blocks on this node: 10
+Public Blocks Adjacency List: {'9d089fbcd94af3eff82eb1d72a9e3c40cdbd0480f212a0b34158dcf8c096a3a5': [], '55750de8bdfaa46835f0dd90435e87f1b854ef55af0dad7ea1080f9e404e367b': ['9d089fbcd94af3eff82eb1d72a9e3c40cdbd0480f212a0b34158dcf8c096a3a5'], '398d20112c83f8442184078dbba6bce43396005c7f854d88df4cbc7111d46139': ['9d089fbcd94af3eff82eb1d72a9e3c40cdbd0480f212a0b34158dcf8c096a3a5'], '5ecbecdc1744f0501f6748cf857b1e9551bee98a6efccd99fedc3b4e9af1711b': ['9d089fbcd94af3eff82eb1d72a9e3c40cdbd0480f212a0b34158dcf8c096a3a5'], 'af0c66c5538ffda7eb5332c612554c7417e78e58990cb359bb899b05d61935c5': ['5ecbecdc1744f0501f6748cf857b1e9551bee98a6efccd99fedc3b4e9af1711b'], 'd31f0fa2cd129e73bfada5960f7e5d40dde2af980789b01232d8a29644cb3915': ['55750de8bdfaa46835f0dd90435e87f1b854ef55af0dad7ea1080f9e404e367b'], '23fe40df0a0f8fea4f75867433e64402f5dfb00f2937c72af90e38b8450cc7b5': ['9d089fbcd94af3eff82eb1d72a9e3c40cdbd0480f212a0b34158dcf8c096a3a5'], '82a0dd919be542449561e0b6a3971efd7988b56d7c63631f3d9dd021fe9b9afe': ['d31f0fa2cd129e73bfada5960f7e5d40dde2af980789b01232d8a29644cb3915'], '5d488c89a29a228da40364bddcf545ef9e8be143687fa736cec7896077793845': ['af0c66c5538ffda7eb5332c612554c7417e78e58990cb359bb899b05d61935c5'], 'be84d854ecaeada9977915b8df1c622c7791e648844a24dcdfeb629d813049d3': ['af0c66c5538ffda7eb5332c612554c7417e78e58990cb359bb899b05d61935c5']}
 
 Public Blocks Details:  
 
 Block Hash                                                                 Timestamp           Depth          Is Genesis     
-a03dce6c77677e56b6701c1b8290e1c723da8a00269b46836f940156e1c95088           0                   0              True           
-993d5619e0f8072cb2a290b34ccce63fee300656fba8fa791b0ba5da5f23b11c           1                   1              False          
-ba1e128f2c0016214cc6bd7aed4f78f736e6b7b23b04781f70522285f8166f15           1                   1              False          
-930f025da04a4321ff61d21319b1df7d917c435789d6f0a7d80c144d5900a91d           1                   1              False          
+9d089fbcd94af3eff82eb1d72a9e3c40cdbd0480f212a0b34158dcf8c096a3a5           0                   0              True           
+55750de8bdfaa46835f0dd90435e87f1b854ef55af0dad7ea1080f9e404e367b           1                   1              False          
+398d20112c83f8442184078dbba6bce43396005c7f854d88df4cbc7111d46139           1                   1              False          
+5ecbecdc1744f0501f6748cf857b1e9551bee98a6efccd99fedc3b4e9af1711b           1                   1              False          
+af0c66c5538ffda7eb5332c612554c7417e78e58990cb359bb899b05d61935c5           368                 2              False          
+d31f0fa2cd129e73bfada5960f7e5d40dde2af980789b01232d8a29644cb3915           23                  2              False          
+23fe40df0a0f8fea4f75867433e64402f5dfb00f2937c72af90e38b8450cc7b5           1                   1              False          
+82a0dd919be542449561e0b6a3971efd7988b56d7c63631f3d9dd021fe9b9afe           590                 3              False          
+5d488c89a29a228da40364bddcf545ef9e8be143687fa736cec7896077793845           688                 3              False          
+be84d854ecaeada9977915b8df1c622c7791e648844a24dcdfeb629d813049d3           422                 3              False          
 
 
 Private Chain Details:  
 
 Block Hash                                                                 Timestamp           Depth          Is Genesis     
-7ff29a8fd5d44202c93d64a3913842eacf76fff74569b4bda77cd102ac5345d4           3103                2              False          
-c196d992d2c02105afa6daf2f809c93600b879c4f2d2c53dda9aeca8c8336430           3135                3              False          
-8b05f0c730de2221e9f7baf9c658f1931930fbdecb3838b248adb167d6c2c2cb           5458                4              False          
-205d2ec243cd339b799e0617b07f1b12bb7fcf9707cccd29d981bca258a59693           9837                5              False          
+c0a73ec7366cf46c78c722ab25832171dc0b64148b148fa7017c204cafb7b08e           691                 4              False          
+ed248ef62f3753fa6829c69396268dacdf726d637502b1dba3d3d7190deeec15           1505                5              False          
+546a4fa6012f0b62ddd4aa1166273c46b91945edfa1ab9d2812ffa5cec339dd7           1552                6              False          
+212fb371f46a1db32b55c90725b8b822fb64bf51b130355d8043bf29e5e5d65a           1606                7              False          
+d9383ade390f90b105f76d06d6efa5fbfe41a939a7f0c5ad2aa3c6f688e19279           1665                8              False          
+f252d22f420cb6f140ec34709754f5ad7104cfc5d344ff93607d661c45eadb8f           1924                9              False          
 
 
-Total Number of Public Blocks in BlockChain: 4
+Total Number of Public Blocks in BlockChain: 10
 
-Total Number of Blocks generated by this attack node in BlockChain (including Private Blocks): 5
+Total Number of Blocks generated by this attack node in BlockChain (including Private Blocks): 8
 
-Length of Public Longest chain: 2
+Length of Public Longest chain: 4
 
 Number of Public Blocks created by this attack node in the Longest Public chain: 1
 
-MPU_node_adv (Number of blocks generated by this adversary node in the Longest Public Chain of the tree/Total number of blocks mined by this adversary overall): 0.2
+MPU_node_adv (Number of blocks generated by this adversary node in the Longest Public Chain of the tree/Total number of blocks mined by this adversary overall): 0.125
 
-MPU_node_overall (Number of block in the final public main chain/Total number of blocks generated across all the nodes): 0.5
+MPU_node_overall (Number of block in the final public main chain/Total number of blocks generated across all the nodes): 0.4
 
-The fraction of the attacker's blocks in the main public chain: 0.5
+The fraction of the attacker's blocks in the main public chain: 0.25
 
 #############################################################################################################################################################
 
 
 Transactions Details:
 
-No. of transactions heard: 312
+No. of transactions heard: 2980
 #############################################################################################################################################################
 
 
