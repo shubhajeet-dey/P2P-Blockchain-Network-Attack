@@ -9,7 +9,7 @@ import sys
 # Class for Attack Node
 class AttackNode:
 	'''
-	NodeID: Unique Identifier for each Node
+	NodeID: Unique Identifier for this Node
 	isSlow: Boolean value stating if the node is slow or fast
 	hashPower: Node's fraction of the total hashing power.
 	PoWI: The interarrival time between blocks on average
